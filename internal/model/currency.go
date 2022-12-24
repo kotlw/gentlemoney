@@ -8,7 +8,8 @@ type Currency struct {
 	IsMain       bool
 }
 
-// NewCurrency returns an empty Currency.
-func NewCurrency() *Currency {
+// NewEmptyCurrency returns an empty Currency. This function for consistancy with NewEmptyAccount
+// and NewEmptyTransaction.
+func NewEmptyCurrency() *Currency {
     return &Currency{}
 }

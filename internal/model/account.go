@@ -7,7 +7,8 @@ type Account struct {
 	Currency    *Currency
 }
 
-// NewAccount returns an empty Account with nested structures.
-func NewAccount() *Account {
-	return &Account{Currency: NewCurrency()}
+// NewEmptyAccount returns an empty Account with non nil nested structure. The purpose of this func
+// to avoid erros when calling nested fields when they points to nil.
+func NewEmptyAccount() *Account {
+	return &Account{Currency: NewEmptyCurrency()}
 }

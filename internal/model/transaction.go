@@ -14,7 +14,8 @@ type Transaction struct {
 	Note     string
 }
 
-// NewTransaction returns an empty Transaction with nested structures.
-func NewTransaction() *Transaction {
-    return &Transaction{Account: NewAccount(), Category: NewCategory()}
+// NewEmptyTransaction returns an empty Transaction with non nil nested structures. The purpose of
+// this func to avoid erros when calling nested fields when they points to nil.
+func NewEmptyTransaction() *Transaction {
+    return &Transaction{Account: NewEmptyAccount(), Category: NewEmptyCategory()}
 }
