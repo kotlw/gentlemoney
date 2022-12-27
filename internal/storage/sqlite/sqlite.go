@@ -1,12 +1,12 @@
-package storage
+package sqlite
 
 import (
 	"database/sql"
 	"fmt"
 )
 
-// Storage is a facade structure which aggregates all storages. It is used for convenience.
-type Storage struct {
+// SqliteStorage is a facade structure which aggregates all sqlite storages. It is used for convenience.
+type SqliteStorage struct {
 	category    *Category
 	currency    *Currency
 	account     *Account
@@ -14,8 +14,8 @@ type Storage struct {
 }
 
 // New creates object which aggregates all storages.
-func New(db *sql.DB) (s *Storage, err error) {
-	s = &Storage{}
+func New(db *sql.DB) (s *SqliteStorage, err error) {
+	s = &SqliteStorage{}
 
 	if s.category, err = NewCategory(db); err != nil {
 		return nil, fmt.Errorf("NewCategory: %w", err)
@@ -33,22 +33,22 @@ func New(db *sql.DB) (s *Storage, err error) {
 	return s, nil
 }
 
-// Category returns category storage.
-func (s *Storage) Category() *Category {
+// Category returns category sqlite storage.
+func (s *SqliteStorage) Category() *Category {
 	return s.category
 }
 
-// Currency returns currency storage.
-func (s *Storage) Currency() *Currency {
+// Currency returns currency sqlite storage.
+func (s *SqliteStorage) Currency() *Currency {
 	return s.currency
 }
 
-// Account returns account storage.
-func (s *Storage) Account() *Account {
+// Account returns account sqlite storage.
+func (s *SqliteStorage) Account() *Account {
 	return s.account
 }
 
-// Transaction returns transaction storage.
-func (s *Storage) Transaction() *Transaction {
+// Transaction returns transaction sqlite storage.
+func (s *SqliteStorage) Transaction() *Transaction {
 	return s.transaction
 }

@@ -1,11 +1,11 @@
-package storage_test
+package sqlite_test
 
 import (
 	"database/sql"
 	"testing"
 
 	"gentlemoney/internal/model"
-	"gentlemoney/internal/storage"
+	"gentlemoney/internal/storage/sqlite"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
@@ -13,19 +13,19 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type CategoryStorageTestSuite struct {
+type CategorySqliteStorageTestSuite struct {
 	suite.Suite
 	db             *sql.DB
-	storage        *storage.Category
+	storage        *sqlite.Category
 	InitCategories []*model.Category
 }
 
-func (s *CategoryStorageTestSuite) SetupSuite() {
+func (s *CategorySqliteStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	require.NoError(s.T(), err, "occured in SetupSuite")
 	s.db = db
 
-	s.storage, err = storage.NewCategory(db)
+	s.storage, err = sqlite.NewCategory(db)
 	require.NoError(s.T(), err, "occured in SetupSuite")
 
 	// id's settled by sqlite on insert incrementally starting from 1,
@@ -36,7 +36,7 @@ func (s *CategoryStorageTestSuite) SetupSuite() {
 	}
 }
 
-func (s *CategoryStorageTestSuite) SetupTest() {
+func (s *CategorySqliteStorageTestSuite) SetupTest() {
 	stmt, err := s.db.Prepare(`INSERT INTO category (title) VALUES (?);`)
 	require.NoError(s.T(), err, "occured in SetupTest")
 
@@ -46,7 +46,7 @@ func (s *CategoryStorageTestSuite) SetupTest() {
 	}
 }
 
-func (s *CategoryStorageTestSuite) TestInsertPositive() {
+func (s *CategorySqliteStorageTestSuite) TestInsertPositive() {
 	category := &model.Category{ID: 3, Title: "Sport"}
 	expectedCategories := append(s.InitCategories, category)
 
@@ -55,12 +55,12 @@ func (s *CategoryStorageTestSuite) TestInsertPositive() {
 	assert.ElementsMatch(s.T(), s.fetchActualData(), expectedCategories)
 }
 
-func (s *CategoryStorageTestSuite) TestInsertNegative() {
+func (s *CategorySqliteStorageTestSuite) TestInsertNegative() {
 	_, err := s.storage.Insert(s.InitCategories[1])
     assert.ErrorContains(s.T(), err, "e.db.Exec: UNIQUE constraint failed: category.title")
 }
 
-func (s *CategoryStorageTestSuite) TestUpdatePositive() {
+func (s *CategorySqliteStorageTestSuite) TestUpdatePositive() {
 	expectedCategories := make([]*model.Category, len(s.InitCategories))
 	copy(expectedCategories, s.InitCategories)
 	expectedCategories[1].Title = "Taxi"
@@ -70,12 +70,12 @@ func (s *CategoryStorageTestSuite) TestUpdatePositive() {
 	assert.ElementsMatch(s.T(), s.fetchActualData(), expectedCategories)
 }
 
-func (s *CategoryStorageTestSuite) TestUpdateNegative() {
+func (s *CategorySqliteStorageTestSuite) TestUpdateNegative() {
 	err := s.storage.Update(&model.Category{ID: 10})
 	assert.ErrorContains(s.T(), err, "total affected rows 0 while expected 1")
 }
 
-func (s *CategoryStorageTestSuite) TestDeletePositive() {
+func (s *CategorySqliteStorageTestSuite) TestDeletePositive() {
 	expectedCategories := []*model.Category{s.InitCategories[0]}
 
 	err := s.storage.Delete(2)
@@ -83,18 +83,18 @@ func (s *CategoryStorageTestSuite) TestDeletePositive() {
 	assert.ElementsMatch(s.T(), s.fetchActualData(), expectedCategories)
 }
 
-func (s *CategoryStorageTestSuite) TestDeleteNegative() {
+func (s *CategorySqliteStorageTestSuite) TestDeleteNegative() {
 	err := s.storage.Delete(10)
 	assert.EqualError(s.T(), err, "total affected rows 0 while expected 1")
 }
 
-func (s *CategoryStorageTestSuite) TestGetAll() {
+func (s *CategorySqliteStorageTestSuite) TestGetAll() {
 	actualCategories, err := s.storage.GetAll()
 	require.NoError(s.T(), err)
 	assert.Equal(s.T(), actualCategories, s.InitCategories)
 }
 
-func (s *CategoryStorageTestSuite) fetchActualData() []*model.Category {
+func (s *CategorySqliteStorageTestSuite) fetchActualData() []*model.Category {
 	rows, err := s.db.Query(`SELECT id, title FROM category;`)
 	require.NoError(s.T(), err)
 	defer func() {
@@ -113,16 +113,16 @@ func (s *CategoryStorageTestSuite) fetchActualData() []*model.Category {
 	return res
 }
 
-func (s *CategoryStorageTestSuite) TearDownTest() {
+func (s *CategorySqliteStorageTestSuite) TearDownTest() {
 	_, err := s.db.Exec(`DELETE FROM category;`)
 	require.NoError(s.T(), err, "occured in TearDownTest")
 }
 
-func (s *CategoryStorageTestSuite) TearDownSuite() {
+func (s *CategorySqliteStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
 	require.NoError(s.T(), err, "occured in TearDownSuite")
 }
 
-func TestCategoryStorageTestSuite(t *testing.T) {
-	suite.Run(t, new(CategoryStorageTestSuite))
+func TestCategorySqliteStorageTestSuite(t *testing.T) {
+	suite.Run(t, new(CategorySqliteStorageTestSuite))
 }

@@ -1,11 +1,11 @@
-package storage_test
+package sqlite_test
 
 import (
 	"database/sql"
 	"testing"
 
 	"gentlemoney/internal/model"
-	"gentlemoney/internal/storage"
+	"gentlemoney/internal/storage/sqlite"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
@@ -13,19 +13,19 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type CurrencyStorageTestSuite struct {
+type CurrencySqliteStorageTestSuite struct {
 	suite.Suite
 	db             *sql.DB
-	storage        *storage.Currency
+	storage        *sqlite.Currency
 	InitCurrencies []*model.Currency
 }
 
-func (s *CurrencyStorageTestSuite) SetupSuite() {
+func (s *CurrencySqliteStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	require.NoError(s.T(), err, "occured in SetupSuite")
 	s.db = db
 
-	s.storage, err = storage.NewCurrency(db)
+	s.storage, err = sqlite.NewCurrency(db)
 	require.NoError(s.T(), err, "occured in SetupSuite")
 
 	// id's settled by sqlite on insert incrementally starting from 1,
@@ -36,7 +36,7 @@ func (s *CurrencyStorageTestSuite) SetupSuite() {
 	}
 }
 
-func (s *CurrencyStorageTestSuite) SetupTest() {
+func (s *CurrencySqliteStorageTestSuite) SetupTest() {
 	stmt, err := s.db.Prepare(`INSERT INTO currency(abbreviation, exchangeRate, isMain) VALUES (?, ?, ?);`)
 	require.NoError(s.T(), err, "occured in SetupTest")
 
@@ -46,7 +46,7 @@ func (s *CurrencyStorageTestSuite) SetupTest() {
 	}
 }
 
-func (s *CurrencyStorageTestSuite) TestInsertPositive() {
+func (s *CurrencySqliteStorageTestSuite) TestInsertPositive() {
 	currency := &model.Currency{ID: 3, Abbreviation: "PLN", ExchangeRate: 200, IsMain: false}
 	expectedCurrencies := append(s.InitCurrencies, currency)
 
@@ -55,12 +55,12 @@ func (s *CurrencyStorageTestSuite) TestInsertPositive() {
 	assert.ElementsMatch(s.T(), s.fetchActualData(), expectedCurrencies)
 }
 
-func (s *CurrencyStorageTestSuite) TestInsertNegative() {
+func (s *CurrencySqliteStorageTestSuite) TestInsertNegative() {
 	_, err := s.storage.Insert(s.InitCurrencies[1])
 	assert.EqualError(s.T(), err, "e.db.Exec: UNIQUE constraint failed: currency.abbreviation")
 }
 
-func (s *CurrencyStorageTestSuite) TestUpdatePositive() {
+func (s *CurrencySqliteStorageTestSuite) TestUpdatePositive() {
 	expectedCurrencies := make([]*model.Currency, len(s.InitCurrencies))
 	copy(expectedCurrencies, s.InitCurrencies)
 	expectedCurrencies[1].Abbreviation = "CZN"
@@ -70,12 +70,12 @@ func (s *CurrencyStorageTestSuite) TestUpdatePositive() {
 	assert.ElementsMatch(s.T(), s.fetchActualData(), expectedCurrencies)
 }
 
-func (s *CurrencyStorageTestSuite) TestUpdateNegative() {
+func (s *CurrencySqliteStorageTestSuite) TestUpdateNegative() {
 	err := s.storage.Update(&model.Currency{ID: 10})
 	assert.EqualError(s.T(), err, "total affected rows 0 while expected 1")
 }
 
-func (s *CurrencyStorageTestSuite) TestDeletePositive() {
+func (s *CurrencySqliteStorageTestSuite) TestDeletePositive() {
 	expectedCurrencies := []*model.Currency{s.InitCurrencies[0]}
 
 	err := s.storage.Delete(2)
@@ -83,18 +83,18 @@ func (s *CurrencyStorageTestSuite) TestDeletePositive() {
 	assert.ElementsMatch(s.T(), s.fetchActualData(), expectedCurrencies)
 }
 
-func (s *CurrencyStorageTestSuite) TestDeleteNegative() {
+func (s *CurrencySqliteStorageTestSuite) TestDeleteNegative() {
 	err := s.storage.Delete(10)
 	assert.EqualError(s.T(), err, "total affected rows 0 while expected 1")
 }
 
-func (s *CurrencyStorageTestSuite) TestGetAll() {
+func (s *CurrencySqliteStorageTestSuite) TestGetAll() {
 	allCurrencies, err := s.storage.GetAll()
 	require.NoError(s.T(), err)
 	assert.Equal(s.T(), allCurrencies, s.InitCurrencies)
 }
 
-func (s *CurrencyStorageTestSuite) fetchActualData() []*model.Currency {
+func (s *CurrencySqliteStorageTestSuite) fetchActualData() []*model.Currency {
 	rows, err := s.db.Query(`SELECT id, abbreviation, exchangeRate, isMain FROM currency;`)
 	require.NoError(s.T(), err)
 	defer func() {
@@ -113,7 +113,7 @@ func (s *CurrencyStorageTestSuite) fetchActualData() []*model.Currency {
 	return res
 }
 
-func (s *CurrencyStorageTestSuite) TearDownTest() {
+func (s *CurrencySqliteStorageTestSuite) TearDownTest() {
 	stmt, err := s.db.Prepare(`DELETE FROM currency;`)
 	require.NoError(s.T(), err, "occured in TearDownTest")
 
@@ -121,11 +121,11 @@ func (s *CurrencyStorageTestSuite) TearDownTest() {
 	require.NoError(s.T(), err, "occured in TearDownTest")
 }
 
-func (s *CurrencyStorageTestSuite) TearDownSuite() {
+func (s *CurrencySqliteStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
 	require.NoError(s.T(), err, "occured in TearDownSuite")
 }
 
-func TestCurrencyStorageTestSuite(t *testing.T) {
-	suite.Run(t, new(CurrencyStorageTestSuite))
+func TestCurrencySqliteStorageTestSuite(t *testing.T) {
+	suite.Run(t, new(CurrencySqliteStorageTestSuite))
 }
