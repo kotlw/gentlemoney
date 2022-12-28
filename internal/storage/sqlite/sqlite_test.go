@@ -60,6 +60,14 @@ func (s *SqliteStorageTestSuite) TestNewAccountNegative() {
 }
 
 func (s *SqliteStorageTestSuite) TestNewTransactionNegative() {
+	storage, _ := sqlite.New(s.db)
+	storage.Category()
+	storage.Currency()
+	storage.Account()
+	storage.Transaction()
+}
+
+func (s *SqliteStorageTestSuite) TestStorageGet() {
 	_, err := s.db.Exec(`CREATE UNIQUE INDEX "transaction" ON t (id);`)
 	require.NoError(s.T(), err)
 
