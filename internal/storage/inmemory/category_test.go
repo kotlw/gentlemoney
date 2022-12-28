@@ -47,10 +47,13 @@ func (s *CategoryInmemoryStorageTestSuite) TestDeletePositive() {
 }
 
 func (s *CategoryInmemoryStorageTestSuite) TearDownTest() {
-	l := s.storage.GetAll()
-	for _, category := range l {
-		s.storage.Delete(category)
-	}
+    for {
+        cc := s.storage.GetAll()
+        if len(cc) == 0 {
+            break
+        }
+        s.storage.Delete(cc[0])
+    }
 }
 
 func TestCategoryInmemoryStorageTestSuite(t *testing.T) {

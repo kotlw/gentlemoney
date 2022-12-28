@@ -68,10 +68,13 @@ func (s *TransactionInmemoryStorageTestSuite) TestDeletePositive() {
 }
 
 func (s *TransactionInmemoryStorageTestSuite) TearDownTest() {
-	l := s.storage.GetAll()
-	for _, transaction := range l {
-		s.storage.Delete(transaction)
-	}
+    for {
+        tt := s.storage.GetAll()
+        if len(tt) == 0 {
+            break
+        }
+        s.storage.Delete(tt[0])
+    }
 }
 
 func TestTransactionInmemoryStorageTestSuite(t *testing.T) {

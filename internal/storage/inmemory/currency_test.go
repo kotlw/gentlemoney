@@ -47,10 +47,13 @@ func (s *CurrencyInmemoryStorageTestSuite) TestDeletePositive() {
 }
 
 func (s *CurrencyInmemoryStorageTestSuite) TearDownTest() {
-	l := s.storage.GetAll()
-	for _, currency := range l {
-		s.storage.Delete(currency)
-	}
+    for {
+        cc := s.storage.GetAll()
+        if len(cc) == 0 {
+            break
+        }
+        s.storage.Delete(cc[0])
+    }
 }
 
 func TestCurrencyInmemoryStorageTestSuite(t *testing.T) {

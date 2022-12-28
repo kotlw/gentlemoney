@@ -54,9 +54,13 @@ func (s *AccountInmemoryStorageTestSuite) TestDeletePositive() {
 }
 
 func (s *AccountInmemoryStorageTestSuite) TearDownTest() {
-	for _, account := range s.storage.GetAll() {
-		s.storage.Delete(account)
-	}
+    for {
+        aa := s.storage.GetAll()
+        if len(aa) == 0 {
+            break
+        }
+        s.storage.Delete(aa[0])
+    }
 }
 
 func TestAccountInmemoryStorageTestSuite(t *testing.T) {
