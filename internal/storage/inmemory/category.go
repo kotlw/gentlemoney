@@ -6,16 +6,16 @@ import (
 
 // Category is used to acces inmemory storage.
 type Category struct {
-	categories        []*model.Category
-	categoryByID      map[int64]*model.Category
-	categoryByTitle   map[string]*model.Category
+	categories      []*model.Category
+	categoryByID    map[int64]*model.Category
+	categoryByTitle map[string]*model.Category
 }
 
 // NewCategory returns new category inmemory storage.
 func NewCategory() *Category {
 	return &Category{
-		categories: make([]*model.Category, 0, 20),
-		categoryByID: make(map[int64]*model.Category),
+		categories:      make([]*model.Category, 0, 20),
+		categoryByID:    make(map[int64]*model.Category),
 		categoryByTitle: make(map[string]*model.Category),
 	}
 }

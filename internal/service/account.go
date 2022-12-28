@@ -18,18 +18,18 @@ func (aa accountList) Swap(i, j int)      { aa[i], aa[j] = aa[j], aa[i] }
 
 // Account service contains business logic related to model.Account.
 type Account struct {
-	persistantStorage *sqlite.Account
+	persistentStorage *sqlite.Account
 	inmemoryStorage   *inmemory.Account
 }
 
 // NewAccount returns Account service.
 func NewAccount(
-	persistantStorage *sqlite.Account,
+	persistentStorage *sqlite.Account,
 	inmemoryStorage *inmemory.Account,
 	currencyService *Currency) (*Account, error) {
 
 	a := &Account{
-		persistantStorage: persistantStorage,
+		persistentStorage: persistentStorage,
 		inmemoryStorage:   inmemoryStorage,
 	}
 
@@ -40,28 +40,28 @@ func NewAccount(
 	return a, nil
 }
 
-// Init initialize inmemory storage with data from persistant storage. It is also links existing
+// Init initialize inmemory storage with data from persistent storage. It is also links existing
 // currencies to corresponding fields of model.Account.
 func (s *Account) Init(currencyService *Currency) error {
-	aa, err := s.persistantStorage.GetAll()
+	aa, err := s.persistentStorage.GetAll()
 	if err != nil {
-		return fmt.Errorf("s.persistantStorage.GetAll: %w", err)
+		return fmt.Errorf("s.persistentStorage.GetAll: %w", err)
 	}
 
-    for _, a := range aa {
-        a.Currency = currencyService.GetByID(a.Currency.ID)
-    }
+	for _, a := range aa {
+		a.Currency = currencyService.GetByID(a.Currency.ID)
+	}
 
 	s.inmemoryStorage.Init(aa)
 
 	return nil
 }
 
-// Insert appends account to both persistant and inmemory storages.
+// Insert appends account to both persistent and inmemory storages.
 func (s *Account) Insert(c *model.Account) error {
-	id, err := s.persistantStorage.Insert(c)
+	id, err := s.persistentStorage.Insert(c)
 	if err != nil {
-		return fmt.Errorf("s.persistantStorage.Insert: %w", err)
+		return fmt.Errorf("s.persistentStorage.Insert: %w", err)
 	}
 
 	c.ID = id
@@ -70,19 +70,19 @@ func (s *Account) Insert(c *model.Account) error {
 	return nil
 }
 
-// Update updates account in persistant storage. Since GetAll returns pointers to inmemory data
-// after update the category we need to update it in persistant storage as well.
+// Update updates account in persistent storage. Since GetAll returns pointers to inmemory data
+// after update the category we need to update it in persistent storage as well.
 func (s *Account) Update(c *model.Account) error {
-	if err := s.persistantStorage.Update(c); err != nil {
-		return fmt.Errorf("s.persistantStorage.Update: %w", err)
+	if err := s.persistentStorage.Update(c); err != nil {
+		return fmt.Errorf("s.persistentStorage.Update: %w", err)
 	}
 	return nil
 }
 
-// Delete deletes account from inmemory and persistant storages.
+// Delete deletes account from inmemory and persistent storages.
 func (s *Account) Delete(c *model.Account) error {
-	if err := s.persistantStorage.Delete(c.ID); err != nil {
-		return fmt.Errorf("s.persistantStorage.Delete: %w", err)
+	if err := s.persistentStorage.Delete(c.ID); err != nil {
+		return fmt.Errorf("s.persistentStorage.Delete: %w", err)
 	}
 	s.inmemoryStorage.Delete(c)
 	return nil

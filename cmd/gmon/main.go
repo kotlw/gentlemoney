@@ -1,9 +1,9 @@
 package main
 
 import (
-    "gentlemoney/internal/app"
+	"github.com/kotlw/gentlemoney/internal/app"
 )
 
 func main() {
-    app.Run()
+	app.Run()
 }

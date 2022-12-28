@@ -23,11 +23,11 @@ type TransactionSqliteStorageTestSuite struct {
 
 func (s *TransactionSqliteStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
 
 	s.storage, err = sqlite.NewTransaction(db)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
@@ -53,11 +53,11 @@ func (s *TransactionSqliteStorageTestSuite) SetupSuite() {
 
 func (s *TransactionSqliteStorageTestSuite) SetupTest() {
 	stmt, err := s.db.Prepare(`INSERT INTO "transaction" (date, accountId, categoryId, amount, note) VALUES (?, ?, ?, ?, ?);`)
-	require.NoError(s.T(), err, "occured in SetupTest")
+	require.NoError(s.T(), err, "occurred in SetupTest")
 
 	for _, tr := range s.InitTransactions {
 		_, err := stmt.Exec(&tr.Date, &tr.Account.ID, &tr.Category.ID, &tr.Amount, &tr.Note)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 }
 
@@ -89,8 +89,8 @@ func (s *TransactionSqliteStorageTestSuite) TestUpdatePositive() {
 }
 
 func (s *TransactionSqliteStorageTestSuite) TestUpdateNegative() {
-    tr := model.NewEmptyTransaction()
-    tr.ID = 10
+	tr := model.NewEmptyTransaction()
+	tr.ID = 10
 	err := s.storage.Update(tr)
 	assert.EqualError(s.T(), err, "total affected rows 0 while expected 1")
 }
@@ -124,7 +124,7 @@ func (s *TransactionSqliteStorageTestSuite) fetchActualData() []*model.Transacti
 
 	res := make([]*model.Transaction, 0, 3)
 	for rows.Next() {
-		t := model.NewEmptyTransaction() 
+		t := model.NewEmptyTransaction()
 		err = rows.Scan(&t.ID, &t.Date, &t.Amount, &t.Note, &t.Account.ID, &t.Category.ID)
 		require.NoError(s.T(), err)
 		res = append(res, t)
@@ -135,15 +135,15 @@ func (s *TransactionSqliteStorageTestSuite) fetchActualData() []*model.Transacti
 
 func (s *TransactionSqliteStorageTestSuite) TearDownTest() {
 	stmt, err := s.db.Prepare(`DELETE FROM "transaction";`)
-	require.NoError(s.T(), err, "occured in TearDownTest")
+	require.NoError(s.T(), err, "occurred in TearDownTest")
 
 	_, err = stmt.Exec()
-	require.NoError(s.T(), err, "occured in TearDownTest")
+	require.NoError(s.T(), err, "occurred in TearDownTest")
 }
 
 func (s *TransactionSqliteStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
-	require.NoError(s.T(), err, "occured in TearDownSuite")
+	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
 func TestTransactionSqliteStorageTestSuite(t *testing.T) {

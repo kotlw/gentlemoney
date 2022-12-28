@@ -44,7 +44,7 @@ func (s *Account) Delete(a *model.Account) {
 	if len(s.accounts) == 1 {
 		s.accounts = make([]*model.Account, 0, 20)
 	} else {
-        i := findIndex(a, s.accounts)
+		i := findIndex(a, s.accounts)
 		s.accounts = append(s.accounts[:i], s.accounts[i+1:]...)
 	}
 }

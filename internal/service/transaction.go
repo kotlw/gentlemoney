@@ -18,19 +18,19 @@ func (tt transactionList) Swap(i, j int)      { tt[i], tt[j] = tt[j], tt[i] }
 
 // Transaction service contains business logic related to model.Transaction.
 type Transaction struct {
-	persistantStorage *sqlite.Transaction
+	persistentStorage *sqlite.Transaction
 	inmemoryStorage   *inmemory.Transaction
 }
 
 // NewCurrency returns Transaction service.
 func NewTransaction(
-	persistantStorage *sqlite.Transaction,
+	persistentStorage *sqlite.Transaction,
 	inmemoryStorage *inmemory.Transaction,
 	categoryService *Category,
 	accountService *Account) (*Transaction, error) {
 
 	a := &Transaction{
-		persistantStorage: persistantStorage,
+		persistentStorage: persistentStorage,
 		inmemoryStorage:   inmemoryStorage,
 	}
 
@@ -41,29 +41,29 @@ func NewTransaction(
 	return a, nil
 }
 
-// Init initialize inmemory storage with data from persistant storage. It is also links existing
+// Init initialize inmemory storage with data from persistent storage. It is also links existing
 // categories and accounts to corresponding fields of model.Transaction.
 func (s *Transaction) Init(categoryService *Category, accountService *Account) error {
-	tt, err := s.persistantStorage.GetAll()
+	tt, err := s.persistentStorage.GetAll()
 	if err != nil {
-		return fmt.Errorf("s.persistantStorage.GetAll: %w", err)
+		return fmt.Errorf("s.persistentStorage.GetAll: %w", err)
 	}
 
-    for _, t := range tt {
-        t.Category = categoryService.GetByID(t.Category.ID)
-        t.Account = accountService.GetByID(t.Account.ID)
-    }
+	for _, t := range tt {
+		t.Category = categoryService.GetByID(t.Category.ID)
+		t.Account = accountService.GetByID(t.Account.ID)
+	}
 
 	s.inmemoryStorage.Init(tt)
 
 	return nil
 }
 
-// Insert appends transaction to both persistant and inmemory storages.
+// Insert appends transaction to both persistent and inmemory storages.
 func (s *Transaction) Insert(c *model.Transaction) error {
-	id, err := s.persistantStorage.Insert(c)
+	id, err := s.persistentStorage.Insert(c)
 	if err != nil {
-		return fmt.Errorf("s.persistantStorage.Insert: %w", err)
+		return fmt.Errorf("s.persistentStorage.Insert: %w", err)
 	}
 
 	c.ID = id
@@ -72,19 +72,19 @@ func (s *Transaction) Insert(c *model.Transaction) error {
 	return nil
 }
 
-// Update updates transaction in persistant storage. Since GetAll returns pointers to inmemory data
-// after update the category we need to update it in persistant storage as well.
+// Update updates transaction in persistent storage. Since GetAll returns pointers to inmemory data
+// after update the category we need to update it in persistent storage as well.
 func (s *Transaction) Update(c *model.Transaction) error {
-	if err := s.persistantStorage.Update(c); err != nil {
-		return fmt.Errorf("s.persistantStorage.Update: %w", err)
+	if err := s.persistentStorage.Update(c); err != nil {
+		return fmt.Errorf("s.persistentStorage.Update: %w", err)
 	}
 	return nil
 }
 
-// Delete deletes transaction from inmemory and persistant storages.
+// Delete deletes transaction from inmemory and persistent storages.
 func (s *Transaction) Delete(c *model.Transaction) error {
-	if err := s.persistantStorage.Delete(c.ID); err != nil {
-		return fmt.Errorf("s.persistantStorage.Delete: %w", err)
+	if err := s.persistentStorage.Delete(c.ID); err != nil {
+		return fmt.Errorf("s.persistentStorage.Delete: %w", err)
 	}
 	s.inmemoryStorage.Delete(c)
 	return nil

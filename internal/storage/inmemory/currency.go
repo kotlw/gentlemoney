@@ -44,7 +44,7 @@ func (s *Currency) Delete(c *model.Currency) {
 	if len(s.currencies) == 1 {
 		s.currencies = make([]*model.Currency, 0, 20)
 	} else {
-        i := findIndex(c, s.currencies)
+		i := findIndex(c, s.currencies)
 		s.currencies = append(s.currencies[:i], s.currencies[i+1:]...)
 	}
 }

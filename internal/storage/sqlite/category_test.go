@@ -22,11 +22,11 @@ type CategorySqliteStorageTestSuite struct {
 
 func (s *CategorySqliteStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
 
 	s.storage, err = sqlite.NewCategory(db)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
@@ -38,11 +38,11 @@ func (s *CategorySqliteStorageTestSuite) SetupSuite() {
 
 func (s *CategorySqliteStorageTestSuite) SetupTest() {
 	stmt, err := s.db.Prepare(`INSERT INTO category (title) VALUES (?);`)
-	require.NoError(s.T(), err, "occured in SetupTest")
+	require.NoError(s.T(), err, "occurred in SetupTest")
 
 	for _, category := range s.InitCategories {
 		_, err := stmt.Exec(category.Title)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 }
 
@@ -57,7 +57,7 @@ func (s *CategorySqliteStorageTestSuite) TestInsertPositive() {
 
 func (s *CategorySqliteStorageTestSuite) TestInsertNegative() {
 	_, err := s.storage.Insert(s.InitCategories[1])
-    assert.ErrorContains(s.T(), err, "e.db.Exec: UNIQUE constraint failed: category.title")
+	assert.ErrorContains(s.T(), err, "e.db.Exec: UNIQUE constraint failed: category.title")
 }
 
 func (s *CategorySqliteStorageTestSuite) TestUpdatePositive() {
@@ -115,12 +115,12 @@ func (s *CategorySqliteStorageTestSuite) fetchActualData() []*model.Category {
 
 func (s *CategorySqliteStorageTestSuite) TearDownTest() {
 	_, err := s.db.Exec(`DELETE FROM category;`)
-	require.NoError(s.T(), err, "occured in TearDownTest")
+	require.NoError(s.T(), err, "occurred in TearDownTest")
 }
 
 func (s *CategorySqliteStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
-	require.NoError(s.T(), err, "occured in TearDownSuite")
+	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
 func TestCategorySqliteStorageTestSuite(t *testing.T) {

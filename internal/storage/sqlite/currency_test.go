@@ -22,11 +22,11 @@ type CurrencySqliteStorageTestSuite struct {
 
 func (s *CurrencySqliteStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
 
 	s.storage, err = sqlite.NewCurrency(db)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
@@ -38,11 +38,11 @@ func (s *CurrencySqliteStorageTestSuite) SetupSuite() {
 
 func (s *CurrencySqliteStorageTestSuite) SetupTest() {
 	stmt, err := s.db.Prepare(`INSERT INTO currency(abbreviation, exchangeRate, isMain) VALUES (?, ?, ?);`)
-	require.NoError(s.T(), err, "occured in SetupTest")
+	require.NoError(s.T(), err, "occurred in SetupTest")
 
 	for _, currency := range s.InitCurrencies {
 		_, err := stmt.Exec(currency.Abbreviation, currency.ExchangeRate, currency.IsMain)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 }
 
@@ -115,15 +115,15 @@ func (s *CurrencySqliteStorageTestSuite) fetchActualData() []*model.Currency {
 
 func (s *CurrencySqliteStorageTestSuite) TearDownTest() {
 	stmt, err := s.db.Prepare(`DELETE FROM currency;`)
-	require.NoError(s.T(), err, "occured in TearDownTest")
+	require.NoError(s.T(), err, "occurred in TearDownTest")
 
 	_, err = stmt.Exec()
-	require.NoError(s.T(), err, "occured in TearDownTest")
+	require.NoError(s.T(), err, "occurred in TearDownTest")
 }
 
 func (s *CurrencySqliteStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
-	require.NoError(s.T(), err, "occured in TearDownSuite")
+	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
 func TestCurrencySqliteStorageTestSuite(t *testing.T) {

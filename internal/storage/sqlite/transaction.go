@@ -7,7 +7,7 @@ import (
 	"github.com/kotlw/gentlemoney/internal/model"
 )
 
-// Transaction is used to acces the persistant storage.
+// Transaction is used to acces the persistent storage.
 type Transaction struct {
 	executor executor[model.Transaction]
 }
@@ -38,7 +38,7 @@ func (s *Transaction) CreateTableIfNotExists() error {
 	return err
 }
 
-// Insert transaction into persistant storage.
+// Insert transaction into persistent storage.
 func (s *Transaction) Insert(t *model.Transaction) (int64, error) {
 	return s.executor.insert(
 		`INSERT INTO "transaction" (date, amount, note, accountId, categoryId) VALUES (?, ?, ?, ?, ?);`,
@@ -52,12 +52,12 @@ func (s *Transaction) Update(t *model.Transaction) error {
 		t.Date, t.Amount, t.Note, t.Account.ID, t.Category.ID, t.ID)
 }
 
-// Delete transaction from persistant storage.
+// Delete transaction from persistent storage.
 func (s *Transaction) Delete(id int64) error {
 	return s.executor.update(`DELETE FROM "transaction" WHERE id = ?;`, id)
 }
 
-// GetAll transaction from persistant storage.
+// GetAll transaction from persistent storage.
 func (s *Transaction) GetAll() ([]*model.Transaction, error) {
 	return s.executor.getAll(`SELECT id, date, amount, note, accountId, categoryId FROM "transaction";`,
 		func() (*model.Transaction, []any) {

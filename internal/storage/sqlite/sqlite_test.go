@@ -19,11 +19,11 @@ type SqliteStorageTestSuite struct {
 
 func (s *SqliteStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
 
 	_, err = db.Exec(`CREATE TABLE t(id INTEGER);`)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 }
 
 func (s *SqliteStorageTestSuite) TestNewCategoryNegative() {
@@ -83,12 +83,12 @@ func (s *SqliteStorageTestSuite) TearDownTest() {
                          DROP TABLE IF EXISTS currency;
                          DROP TABLE IF EXISTS account;
                          DROP TABLE IF EXISTS "transaction";`)
-	require.NoError(s.T(), err, "occured in TearDownTest")
+	require.NoError(s.T(), err, "occurred in TearDownTest")
 }
 
 func (s *SqliteStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
-	require.NoError(s.T(), err, "occured in TearDownSuite")
+	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
 func TestSqliteStorageTestSuite(t *testing.T) {

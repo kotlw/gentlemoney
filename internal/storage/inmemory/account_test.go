@@ -13,7 +13,7 @@ import (
 
 type AccountInmemoryStorageTestSuite struct {
 	suite.Suite
-	storage        *inmemory.Account
+	storage      *inmemory.Account
 	InitAccounts []*model.Account
 }
 
@@ -46,13 +46,13 @@ func (s *AccountInmemoryStorageTestSuite) TestDeletePositive() {
 }
 
 func (s *AccountInmemoryStorageTestSuite) TearDownTest() {
-    for {
-        aa := s.storage.GetAll()
-        if len(aa) == 0 {
-            break
-        }
-        s.storage.Delete(aa[0])
-    }
+	for {
+		aa := s.storage.GetAll()
+		if len(aa) == 0 {
+			break
+		}
+		s.storage.Delete(aa[0])
+	}
 }
 
 func TestAccountInmemoryStorageTestSuite(t *testing.T) {

@@ -16,12 +16,12 @@ type executor[T model.Any] struct {
 func (e *executor[_]) insert(query string, args ...any) (int64, error) {
 	res, err := e.db.Exec(query, args...)
 	if err != nil {
-        return -1, fmt.Errorf("e.db.Exec: %w", err)
+		return -1, fmt.Errorf("e.db.Exec: %w", err)
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-        return -1, fmt.Errorf("res.LastInsertId: %w", err)
+		return -1, fmt.Errorf("res.LastInsertId: %w", err)
 	}
 
 	return id, nil
@@ -31,12 +31,12 @@ func (e *executor[_]) insert(query string, args ...any) (int64, error) {
 func (e *executor[_]) update(query string, args ...any) error {
 	res, err := e.db.Exec(query, args...)
 	if err != nil {
-        return fmt.Errorf("e.db.Exec: %w", err)
+		return fmt.Errorf("e.db.Exec: %w", err)
 	}
 
 	rowsAfected, err := res.RowsAffected()
 	if err != nil {
-        return fmt.Errorf("res.RowsAffected: %w", err)
+		return fmt.Errorf("res.RowsAffected: %w", err)
 	}
 	if rowsAfected != 1 {
 		return fmt.Errorf("total affected rows %d while expected 1", rowsAfected)
@@ -45,17 +45,17 @@ func (e *executor[_]) update(query string, args ...any) error {
 	return nil
 }
 
-// getAll returns all rows from persistant storage, it requires dest func which should return new
+// getAll returns all rows from persistent storage, it requires dest func which should return new
 // object of certain type, and addreses of its fields to Scan. Order of addreses should match with
 // order of coresponding columns in query.
 func (e *executor[T]) getAll(query string, dest func() (*T, []any)) ([]*T, error) {
 	rows, err := e.db.Query(query)
 	if err != nil {
-        return nil, fmt.Errorf("stmt.Query: %w", err)
+		return nil, fmt.Errorf("stmt.Query: %w", err)
 	}
 	defer func() {
 		if err = rows.Close(); err != nil {
-            err = fmt.Errorf("defer rows.Close: %w", err)
+			err = fmt.Errorf("defer rows.Close: %w", err)
 		}
 	}()
 
@@ -63,7 +63,7 @@ func (e *executor[T]) getAll(query string, dest func() (*T, []any)) ([]*T, error
 	for rows.Next() {
 		t, addrs := dest()
 		if err = rows.Scan(addrs...); err != nil {
-            return nil, fmt.Errorf("rows.Scan: %w", err)
+			return nil, fmt.Errorf("rows.Scan: %w", err)
 		}
 		res = append(res, t)
 	}

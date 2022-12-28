@@ -22,11 +22,11 @@ type AccountSqliteStorageTestSuite struct {
 
 func (s *AccountSqliteStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
 
 	s.storage, err = sqlite.NewAccount(db)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
@@ -38,11 +38,11 @@ func (s *AccountSqliteStorageTestSuite) SetupSuite() {
 
 func (s *AccountSqliteStorageTestSuite) SetupTest() {
 	stmt, err := s.db.Prepare(`INSERT INTO account(name, currencyId) VALUES (?, ?);`)
-	require.NoError(s.T(), err, "occured in SetupTest")
+	require.NoError(s.T(), err, "occurred in SetupTest")
 
 	for _, account := range s.InitAccounts {
 		_, err := stmt.Exec(&account.Name, &account.Currency.ID)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 }
 
@@ -57,7 +57,7 @@ func (s *AccountSqliteStorageTestSuite) TestInsertPositive() {
 
 func (s *AccountSqliteStorageTestSuite) TestInsertNegative() {
 	_, err := s.storage.Insert(s.InitAccounts[1])
-    assert.EqualError(s.T(), err, "e.db.Exec: UNIQUE constraint failed: account.name")
+	assert.EqualError(s.T(), err, "e.db.Exec: UNIQUE constraint failed: account.name")
 }
 
 func (s *AccountSqliteStorageTestSuite) TestUpdatePositive() {
@@ -115,15 +115,15 @@ func (s *AccountSqliteStorageTestSuite) fetchActualData() []*model.Account {
 
 func (s *AccountSqliteStorageTestSuite) TearDownTest() {
 	stmt, err := s.db.Prepare(`DELETE FROM account;`)
-	require.NoError(s.T(), err, "occured in TearDownTest")
+	require.NoError(s.T(), err, "occurred in TearDownTest")
 
 	_, err = stmt.Exec()
-	require.NoError(s.T(), err, "occured in TearDownTest")
+	require.NoError(s.T(), err, "occurred in TearDownTest")
 }
 
 func (s *AccountSqliteStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
-	require.NoError(s.T(), err, "occured in TearDownSuite")
+	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
 func TestAccountSqliteStorageTestSuite(t *testing.T) {

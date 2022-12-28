@@ -7,7 +7,7 @@ import (
 	"github.com/kotlw/gentlemoney/internal/model"
 )
 
-// Category is used to acces the persistant storage.
+// Category is used to acces the persistent storage.
 type Category struct {
 	executor executor[model.Category]
 }
@@ -32,7 +32,7 @@ func (s *Category) CreateTableIfNotExists() error {
 	return err
 }
 
-// Insert category into persistant storage.
+// Insert category into persistent storage.
 func (s *Category) Insert(c *model.Category) (int64, error) {
 	return s.executor.insert(`INSERT INTO category (title) VALUES (?);`, c.Title)
 }
@@ -42,12 +42,12 @@ func (s *Category) Update(c *model.Category) error {
 	return s.executor.update(`UPDATE category SET title = ? WHERE id = ?;`, c.Title, c.ID)
 }
 
-// Delete category from persistant storage.
+// Delete category from persistent storage.
 func (s *Category) Delete(id int64) error {
 	return s.executor.update(`DELETE FROM category WHERE id = ?;`, id)
 }
 
-// GetAll categories from persistant storage.
+// GetAll categories from persistent storage.
 func (s *Category) GetAll() ([]*model.Category, error) {
 	return s.executor.getAll(`SELECT id, title FROM category;`,
 		func() (*model.Category, []any) {

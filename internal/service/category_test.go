@@ -25,7 +25,7 @@ func (cc categoryList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 type CategoryServiceStorageTestSuite struct {
 	suite.Suite
 	db                *sql.DB
-	persistantStorage *sqlite.Category
+	persistentStorage *sqlite.Category
 	inmemoryStorage   *inmemory.Category
 	service           *service.Category
 	InitCategories    []*model.Category
@@ -33,16 +33,16 @@ type CategoryServiceStorageTestSuite struct {
 
 func (s *CategoryServiceStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
-	require.NoError(s.T(), err, "occured in SetupSuite")
-    s.db = db
+	require.NoError(s.T(), err, "occurred in SetupSuite")
+	s.db = db
 
-	s.persistantStorage, err = sqlite.NewCategory(db)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	s.persistentStorage, err = sqlite.NewCategory(db)
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 
 	s.inmemoryStorage = inmemory.NewCategory()
 
-	s.service, err = service.NewCategory(s.persistantStorage, s.inmemoryStorage)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	s.service, err = service.NewCategory(s.persistentStorage, s.inmemoryStorage)
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
@@ -54,12 +54,12 @@ func (s *CategoryServiceStorageTestSuite) SetupSuite() {
 
 func (s *CategoryServiceStorageTestSuite) SetupTest() {
 	for _, c := range s.InitCategories {
-		_, err := s.persistantStorage.Insert(c)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		_, err := s.persistentStorage.Insert(c)
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 
-    err := s.service.Init()
-    require.NoError(s.T(), err, "occured in SetupTest")
+	err := s.service.Init()
+	require.NoError(s.T(), err, "occurred in SetupTest")
 }
 
 func (s *CategoryServiceStorageTestSuite) TestInsertPositive() {
@@ -69,98 +69,98 @@ func (s *CategoryServiceStorageTestSuite) TestInsertPositive() {
 	err := s.service.Insert(category)
 	require.NoError(s.T(), err)
 
-    persistantCategories, err := s.persistantStorage.GetAll()
+	persistentCategories, err := s.persistentStorage.GetAll()
 	require.NoError(s.T(), err)
-    inmemoryCategories := s.inmemoryStorage.GetAll()
-	assert.ElementsMatch(s.T(), persistantCategories, expectedCategories)
+	inmemoryCategories := s.inmemoryStorage.GetAll()
+	assert.ElementsMatch(s.T(), persistentCategories, expectedCategories)
 	assert.ElementsMatch(s.T(), inmemoryCategories, expectedCategories)
 }
 
 func (s *CategoryServiceStorageTestSuite) TestInsertNegative() {
 	err := s.service.Insert(s.InitCategories[0])
-    assert.ErrorContains(s.T(), err, "s.persistantStorage.Insert: e.db.Exec: UNIQUE constraint failed: category.title")
+	assert.ErrorContains(s.T(), err, "s.persistentStorage.Insert: e.db.Exec: UNIQUE constraint failed: category.title")
 }
 
 func (s *CategoryServiceStorageTestSuite) TestUpdatePositive() {
-    cc := s.service.GetAll()
-    cc[0].Title = "Taxi"
+	cc := s.service.GetAll()
+	cc[0].Title = "Taxi"
 
 	err := s.service.Update(cc[0])
 	require.NoError(s.T(), err)
 
-    persistantCategories, err := s.persistantStorage.GetAll()
-    inmemoryCategories := s.inmemoryStorage.GetAll()
+	persistentCategories, err := s.persistentStorage.GetAll()
+	inmemoryCategories := s.inmemoryStorage.GetAll()
 	require.NoError(s.T(), err)
-	assert.ElementsMatch(s.T(), persistantCategories, inmemoryCategories)
+	assert.ElementsMatch(s.T(), persistentCategories, inmemoryCategories)
 }
 
 func (s *CategoryServiceStorageTestSuite) TestUpdateNegative() {
-    cc := s.service.GetAll()
-    cc[0].Title = "Taxi"
-    cc[0].ID = 10
+	cc := s.service.GetAll()
+	cc[0].Title = "Taxi"
+	cc[0].ID = 10
 
 	err := s.service.Update(cc[0])
-    assert.ErrorContains(s.T(), err, "s.persistantStorage.Update: total affected rows 0 while expected 1")
-    cc[0].ID = 1 // return real id to proper teardown
+	assert.ErrorContains(s.T(), err, "s.persistentStorage.Update: total affected rows 0 while expected 1")
+	cc[0].ID = 1 // return real id to proper teardown
 }
 
 func (s *CategoryServiceStorageTestSuite) TestDeletePositive() {
-    cc := s.service.GetAll()
+	cc := s.service.GetAll()
 	expectedCategories := []*model.Category{cc[0]}
 
 	err := s.service.Delete(cc[1])
 	require.NoError(s.T(), err)
 
-    persistantCategories, err := s.persistantStorage.GetAll()
+	persistentCategories, err := s.persistentStorage.GetAll()
 	require.NoError(s.T(), err)
-    inmemoryCategories := s.inmemoryStorage.GetAll()
-	assert.ElementsMatch(s.T(), persistantCategories, expectedCategories)
+	inmemoryCategories := s.inmemoryStorage.GetAll()
+	assert.ElementsMatch(s.T(), persistentCategories, expectedCategories)
 	assert.ElementsMatch(s.T(), inmemoryCategories, expectedCategories)
 }
 
 func (s *CategoryServiceStorageTestSuite) TestDeleteNegative() {
-    cc := s.service.GetAll()
-    cc[0].ID = 10
+	cc := s.service.GetAll()
+	cc[0].ID = 10
 
 	err := s.service.Delete(cc[0])
-    assert.ErrorContains(s.T(), err, "s.persistantStorage.Delete: total affected rows 0 while expected 1")
-    cc[0].ID = 1 // return real id to proper teardown
+	assert.ErrorContains(s.T(), err, "s.persistentStorage.Delete: total affected rows 0 while expected 1")
+	cc[0].ID = 1 // return real id to proper teardown
 }
 
 func (s *CategoryServiceStorageTestSuite) TestGetByID() {
-    c := s.service.GetByID(2)
-    assert.Equal(s.T(), s.InitCategories[1].Title, c.Title)
+	c := s.service.GetByID(2)
+	assert.Equal(s.T(), s.InitCategories[1].Title, c.Title)
 }
 
 func (s *CategoryServiceStorageTestSuite) TestGetByTitle() {
-    c := s.service.GetByTitle(s.InitCategories[1].Title)
-    assert.Equal(s.T(), s.InitCategories[1].ID, c.ID)
+	c := s.service.GetByTitle(s.InitCategories[1].Title)
+	assert.Equal(s.T(), s.InitCategories[1].ID, c.ID)
 }
 
 func (s *CategoryServiceStorageTestSuite) TestGetAllSorted() {
-    cc := s.service.GetAllSorted()
-    expectedCategories := make([]*model.Category, len(s.InitCategories))
-    copy(expectedCategories, s.InitCategories)
-    sort.Sort(categoryList(expectedCategories))
+	cc := s.service.GetAllSorted()
+	expectedCategories := make([]*model.Category, len(s.InitCategories))
+	copy(expectedCategories, s.InitCategories)
+	sort.Sort(categoryList(expectedCategories))
 	assert.ElementsMatch(s.T(), cc, expectedCategories)
 }
 
 func (s *CategoryServiceStorageTestSuite) TearDownTest() {
-    for {
-        cc := s.service.GetAll()
-        if len(cc) == 0 {
-            break
-        }
-        
-		err := s.persistantStorage.Delete(cc[0].ID)
-		require.NoError(s.T(), err, "occured in TearDownTest")
+	for {
+		cc := s.service.GetAll()
+		if len(cc) == 0 {
+			break
+		}
+
+		err := s.persistentStorage.Delete(cc[0].ID)
+		require.NoError(s.T(), err, "occurred in TearDownTest")
 		s.inmemoryStorage.Delete(cc[0])
-    }
+	}
 }
 
 func (s *CategoryServiceStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
-	require.NoError(s.T(), err, "occured in TearDownSuite")
+	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
 func TestCategoryServiceStorageTestSuite(t *testing.T) {

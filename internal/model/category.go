@@ -9,5 +9,5 @@ type Category struct {
 // NewEmptyCategory returns an empty Category. This function for consistancy with NewEmptyAccount
 // and NewEmptyTransaction.
 func NewEmptyCategory() *Category {
-	return &Category{}	
+	return &Category{}
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/kotlw/gentlemoney/internal/model"
 )
 
-// Currency is used to acces the persistant storage.
+// Currency is used to acces the persistent storage.
 type Currency struct {
 	executor executor[model.Currency]
 }
@@ -34,7 +34,7 @@ func (s *Currency) CreateTableIfNotExists() error {
 	return err
 }
 
-// Insert currency into persistant storage.
+// Insert currency into persistent storage.
 func (s *Currency) Insert(c *model.Currency) (int64, error) {
 	return s.executor.insert(
 		`INSERT INTO currency(abbreviation, exchangeRate, isMain) VALUES (?, ?, ?);`,
@@ -48,12 +48,12 @@ func (s *Currency) Update(c *model.Currency) error {
 		c.Abbreviation, c.ExchangeRate, c.IsMain, c.ID)
 }
 
-// Delete currency from persistant storage.
+// Delete currency from persistent storage.
 func (s *Currency) Delete(id int64) error {
 	return s.executor.update(`DELETE FROM currency WHERE id = ?;`, id)
 }
 
-// GetAll currency from persistant storage.
+// GetAll currency from persistent storage.
 func (s *Currency) GetAll() ([]*model.Currency, error) {
 	return s.executor.getAll(`SELECT id, abbreviation, exchangeRate, isMain FROM currency;`,
 		func() (*model.Currency, []any) {

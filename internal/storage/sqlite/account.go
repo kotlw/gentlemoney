@@ -7,7 +7,7 @@ import (
 	"github.com/kotlw/gentlemoney/internal/model"
 )
 
-// Account is used to acces the persistant storage.
+// Account is used to acces the persistent storage.
 type Account struct {
 	executor executor[model.Account]
 }
@@ -34,7 +34,7 @@ func (s *Account) CreateTableIfNotExists() error {
 	return err
 }
 
-// Insert account into persistant storage.
+// Insert account into persistent storage.
 func (s *Account) Insert(a *model.Account) (int64, error) {
 	return s.executor.insert(
 		`INSERT INTO account(name, currencyId) VALUES (?, ?);`,
@@ -48,12 +48,12 @@ func (s *Account) Update(a *model.Account) error {
 		a.Name, a.Currency.ID, a.ID)
 }
 
-// Delete account from persistant storage.
+// Delete account from persistent storage.
 func (s *Account) Delete(id int64) error {
 	return s.executor.update(`DELETE FROM account WHERE id = ?;`, id)
 }
 
-// GetAll accounts from persistant storage.
+// GetAll accounts from persistent storage.
 func (s *Account) GetAll() ([]*model.Account, error) {
 	return s.executor.getAll(`SELECT id, name, currencyId FROM account;`,
 		func() (*model.Account, []any) {

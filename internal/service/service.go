@@ -2,11 +2,10 @@ package service
 
 import (
 	"fmt"
-	
-	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
-	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
-)
 
+	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
+	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
+)
 
 // Service is a facade structure which aggregates all Services. It is used for convenience.
 type Service struct {
@@ -41,12 +40,12 @@ func (s *Service) Category() *Category {
 	return s.category
 }
 
-// Currency returns currency service. 
+// Currency returns currency service.
 func (s *Service) Currency() *Currency {
 	return s.currency
 }
 
-// Account returns account service. 
+// Account returns account service.
 func (s *Service) Account() *Account {
 	return s.account
 }

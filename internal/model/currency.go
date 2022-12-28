@@ -11,5 +11,5 @@ type Currency struct {
 // NewEmptyCurrency returns an empty Currency. This function for consistancy with NewEmptyAccount
 // and NewEmptyTransaction.
 func NewEmptyCurrency() *Currency {
-    return &Currency{}
+	return &Currency{}
 }

@@ -24,24 +24,24 @@ func (cc accountList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 
 type AccountServiceStorageTestSuite struct {
 	suite.Suite
-	db                        *sql.DB
-	persistantStorage *sqlite.SqliteStorage
+	db                *sql.DB
+	persistentStorage *sqlite.SqliteStorage
 	inmemoryStorage   *inmemory.InmemoryStorage
 	service           *service.Service
-	InitCurrencies            []*model.Currency
-	InitAccounts              []*model.Account
+	InitCurrencies    []*model.Currency
+	InitAccounts      []*model.Account
 }
 
 func (s *AccountServiceStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
 
-	s.persistantStorage, err = sqlite.New(db)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	s.persistentStorage, err = sqlite.New(db)
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.inmemoryStorage = inmemory.New()
-	s.service, err = service.New(s.persistantStorage, s.inmemoryStorage)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	s.service, err = service.New(s.persistentStorage, s.inmemoryStorage)
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
@@ -54,24 +54,24 @@ func (s *AccountServiceStorageTestSuite) SetupSuite() {
 		{ID: 2, Name: "ACard2", Currency: s.InitCurrencies[1]},
 	}
 
-    // init currencies
+	// init currencies
 	for _, c := range s.InitCurrencies {
-		_, err = s.persistantStorage.Currency().Insert(c)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		_, err = s.persistentStorage.Currency().Insert(c)
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 
 	err = s.service.Currency().Init()
-	require.NoError(s.T(), err, "occured in SetupTest")
+	require.NoError(s.T(), err, "occurred in SetupTest")
 }
 
 func (s *AccountServiceStorageTestSuite) SetupTest() {
 	for _, a := range s.InitAccounts {
-        _, err := s.persistantStorage.Account().Insert(a)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		_, err := s.persistentStorage.Account().Insert(a)
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 
-    err := s.service.Account().Init(s.service.Currency())
-	require.NoError(s.T(), err, "occured in SetupTest")
+	err := s.service.Account().Init(s.service.Currency())
+	require.NoError(s.T(), err, "occurred in SetupTest")
 }
 
 func (s *AccountServiceStorageTestSuite) TestLinkage() {
@@ -88,15 +88,15 @@ func (s *AccountServiceStorageTestSuite) TestInsertPositive() {
 	err := s.service.Account().Insert(account)
 	require.NoError(s.T(), err)
 
-	persistantAccounts := s.getLinkedPersistantAccounts()
+	persistentAccounts := s.getLinkedPersistantAccounts()
 	inmemoryAccounts := s.inmemoryStorage.Account().GetAll()
-	assert.ElementsMatch(s.T(), persistantAccounts, expectedAccounts)
+	assert.ElementsMatch(s.T(), persistentAccounts, expectedAccounts)
 	assert.ElementsMatch(s.T(), inmemoryAccounts, expectedAccounts)
 }
 
 func (s *AccountServiceStorageTestSuite) TestInsertNegative() {
 	err := s.service.Account().Insert(s.InitAccounts[0])
-	assert.ErrorContains(s.T(), err, "s.persistantStorage.Insert: e.db.Exec: UNIQUE constraint failed: account.name")
+	assert.ErrorContains(s.T(), err, "s.persistentStorage.Insert: e.db.Exec: UNIQUE constraint failed: account.name")
 }
 
 func (s *AccountServiceStorageTestSuite) TestUpdatePositive() {
@@ -106,10 +106,10 @@ func (s *AccountServiceStorageTestSuite) TestUpdatePositive() {
 	err := s.service.Account().Update(aa[0])
 	require.NoError(s.T(), err)
 
-	persistantAccounts := s.getLinkedPersistantAccounts()
+	persistentAccounts := s.getLinkedPersistantAccounts()
 	inmemoryAccounts := s.inmemoryStorage.Account().GetAll()
 	require.NoError(s.T(), err)
-	assert.ElementsMatch(s.T(), persistantAccounts, inmemoryAccounts)
+	assert.ElementsMatch(s.T(), persistentAccounts, inmemoryAccounts)
 }
 
 func (s *AccountServiceStorageTestSuite) TestUpdateNegative() {
@@ -118,7 +118,7 @@ func (s *AccountServiceStorageTestSuite) TestUpdateNegative() {
 	aa[0].ID = 10
 
 	err := s.service.Account().Update(aa[0])
-	assert.ErrorContains(s.T(), err, "s.persistantStorage.Update: total affected rows 0 while expected 1")
+	assert.ErrorContains(s.T(), err, "s.persistentStorage.Update: total affected rows 0 while expected 1")
 	aa[0].ID = 1 // return real id to proper teardown
 }
 
@@ -129,9 +129,9 @@ func (s *AccountServiceStorageTestSuite) TestDeletePositive() {
 	err := s.service.Account().Delete(aa[1])
 	require.NoError(s.T(), err)
 
-	persistantAccounts := s.getLinkedPersistantAccounts()
+	persistentAccounts := s.getLinkedPersistantAccounts()
 	inmemoryAccounts := s.inmemoryStorage.Account().GetAll()
-	assert.ElementsMatch(s.T(), persistantAccounts, expectedAccounts)
+	assert.ElementsMatch(s.T(), persistentAccounts, expectedAccounts)
 	assert.ElementsMatch(s.T(), inmemoryAccounts, expectedAccounts)
 }
 
@@ -140,7 +140,7 @@ func (s *AccountServiceStorageTestSuite) TestDeleteNegative() {
 	aa[0].ID = 10
 
 	err := s.service.Account().Delete(aa[0])
-	assert.ErrorContains(s.T(), err, "s.persistantStorage.Delete: total affected rows 0 while expected 1")
+	assert.ErrorContains(s.T(), err, "s.persistentStorage.Delete: total affected rows 0 while expected 1")
 	aa[0].ID = 1 // return real id to proper teardown
 }
 
@@ -163,14 +163,14 @@ func (s *AccountServiceStorageTestSuite) TestGetAllSorted() {
 }
 
 func (s *AccountServiceStorageTestSuite) getLinkedPersistantAccounts() []*model.Account {
-	persistantAccounts, err := s.persistantStorage.Account().GetAll()
+	persistentAccounts, err := s.persistentStorage.Account().GetAll()
 	require.NoError(s.T(), err)
 
-	for _, a := range persistantAccounts {
+	for _, a := range persistentAccounts {
 		a.Currency = s.service.Currency().GetByID(a.Currency.ID)
 	}
 
-	return persistantAccounts
+	return persistentAccounts
 }
 
 func (s *AccountServiceStorageTestSuite) TearDownTest() {
@@ -180,15 +180,15 @@ func (s *AccountServiceStorageTestSuite) TearDownTest() {
 			break
 		}
 
-		err := s.persistantStorage.Account().Delete(aa[0].ID)
-		require.NoError(s.T(), err, "occured in TearDownTest")
+		err := s.persistentStorage.Account().Delete(aa[0].ID)
+		require.NoError(s.T(), err, "occurred in TearDownTest")
 		s.inmemoryStorage.Account().Delete(aa[0])
 	}
 }
 
 func (s *AccountServiceStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
-	require.NoError(s.T(), err, "occured in TearDownSuite")
+	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
 func TestAccountServiceStorageTestSuite(t *testing.T) {

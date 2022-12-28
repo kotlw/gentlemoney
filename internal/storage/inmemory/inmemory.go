@@ -14,12 +14,12 @@ type InmemoryStorage struct {
 
 // New returns new InmemoryStorage.
 func New() *InmemoryStorage {
-    return &InmemoryStorage{
-        category: NewCategory(),
-        currency: NewCurrency(),
-        account: NewAccount(),
-        transaction: NewTransaction(),
-    }
+	return &InmemoryStorage{
+		category:    NewCategory(),
+		currency:    NewCurrency(),
+		account:     NewAccount(),
+		transaction: NewTransaction(),
+	}
 }
 
 // Category returns category inmemory storage.

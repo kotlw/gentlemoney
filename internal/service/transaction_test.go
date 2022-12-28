@@ -2,9 +2,9 @@ package service_test
 
 import (
 	"database/sql"
-	"time"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/kotlw/gentlemoney/internal/model"
 	"github.com/kotlw/gentlemoney/internal/service"
@@ -26,7 +26,7 @@ func (tt transactionList) Swap(i, j int)      { tt[i], tt[j] = tt[j], tt[i] }
 type TransactionServiceStorageTestSuite struct {
 	suite.Suite
 	db                *sql.DB
-	persistantStorage *sqlite.SqliteStorage
+	persistentStorage *sqlite.SqliteStorage
 	inmemoryStorage   *inmemory.InmemoryStorage
 	service           *service.Service
 	InitCategories    []*model.Category
@@ -37,14 +37,14 @@ type TransactionServiceStorageTestSuite struct {
 
 func (s *TransactionServiceStorageTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
 
-	s.persistantStorage, err = sqlite.New(db)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	s.persistentStorage, err = sqlite.New(db)
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.inmemoryStorage = inmemory.New()
-	s.service, err = service.New(s.persistantStorage, s.inmemoryStorage)
-	require.NoError(s.T(), err, "occured in SetupSuite")
+	s.service, err = service.New(s.persistentStorage, s.inmemoryStorage)
+	require.NoError(s.T(), err, "occurred in SetupSuite")
 
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
@@ -81,42 +81,42 @@ func (s *TransactionServiceStorageTestSuite) SetupSuite() {
 
 	// init categories
 	for _, c := range s.InitCategories {
-		_, err = s.persistantStorage.Category().Insert(c)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		_, err = s.persistentStorage.Category().Insert(c)
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 
 	err = s.service.Category().Init()
-	require.NoError(s.T(), err, "occured in SetupTest")
+	require.NoError(s.T(), err, "occurred in SetupTest")
 
 	// init currencies
 	for _, c := range s.InitCurrencies {
-		_, err = s.persistantStorage.Currency().Insert(c)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		_, err = s.persistentStorage.Currency().Insert(c)
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 
 	err = s.service.Currency().Init()
-	require.NoError(s.T(), err, "occured in SetupTest")
+	require.NoError(s.T(), err, "occurred in SetupTest")
 
 	// init accounts
 	for _, a := range s.InitAccounts {
-		_, err = s.persistantStorage.Account().Insert(a)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		_, err = s.persistentStorage.Account().Insert(a)
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 
 	err = s.service.Account().Init(s.service.Currency())
-	require.NoError(s.T(), err, "occured in SetupTest")
+	require.NoError(s.T(), err, "occurred in SetupTest")
 
 }
 
 func (s *TransactionServiceStorageTestSuite) SetupTest() {
 	// init transactions
 	for _, t := range s.InitTransactions {
-		_, err := s.persistantStorage.Transaction().Insert(t)
-		require.NoError(s.T(), err, "occured in SetupTest")
+		_, err := s.persistentStorage.Transaction().Insert(t)
+		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 
 	err := s.service.Transaction().Init(s.service.Category(), s.service.Account())
-	require.NoError(s.T(), err, "occured in SetupTest")
+	require.NoError(s.T(), err, "occurred in SetupTest")
 }
 
 func (s *TransactionServiceStorageTestSuite) TestLinkage() {
@@ -142,24 +142,24 @@ func (s *TransactionServiceStorageTestSuite) TestInsertPositive() {
 	err := s.service.Transaction().Insert(transaction)
 	require.NoError(s.T(), err)
 
-	persistantTransactions := s.getLinkedPersistantTransactions()
+	persistentTransactions := s.getLinkedPersistantTransactions()
 	inmemoryTransactions := s.inmemoryStorage.Transaction().GetAll()
-	assert.ElementsMatch(s.T(), persistantTransactions, expectedTransactions)
+	assert.ElementsMatch(s.T(), persistentTransactions, expectedTransactions)
 	assert.ElementsMatch(s.T(), inmemoryTransactions, expectedTransactions)
 }
 
 func (s *TransactionServiceStorageTestSuite) TestUpdatePositive() {
 	tt := s.service.Transaction().GetAll()
-	tt[0].Amount = 99102 
+	tt[0].Amount = 99102
 	tt[0].Note = "CHANGED"
 
 	err := s.service.Transaction().Update(tt[0])
 	require.NoError(s.T(), err)
 
-	persistantTransactions := s.getLinkedPersistantTransactions()
+	persistentTransactions := s.getLinkedPersistantTransactions()
 	inmemoryTransactions := s.inmemoryStorage.Transaction().GetAll()
 	require.NoError(s.T(), err)
-	assert.ElementsMatch(s.T(), persistantTransactions, inmemoryTransactions)
+	assert.ElementsMatch(s.T(), persistentTransactions, inmemoryTransactions)
 }
 
 func (s *TransactionServiceStorageTestSuite) TestUpdateNegative() {
@@ -168,7 +168,7 @@ func (s *TransactionServiceStorageTestSuite) TestUpdateNegative() {
 	tt[0].Note = "CHANGED"
 
 	err := s.service.Transaction().Update(tt[0])
-	assert.ErrorContains(s.T(), err, "s.persistantStorage.Update: total affected rows 0 while expected 1")
+	assert.ErrorContains(s.T(), err, "s.persistentStorage.Update: total affected rows 0 while expected 1")
 	tt[0].ID = 1 // return real id to proper teardown
 }
 
@@ -179,9 +179,9 @@ func (s *TransactionServiceStorageTestSuite) TestDeletePositive() {
 	err := s.service.Transaction().Delete(tt[1])
 	require.NoError(s.T(), err)
 
-	persistantTransactions := s.getLinkedPersistantTransactions()
+	persistentTransactions := s.getLinkedPersistantTransactions()
 	inmemoryTransactions := s.inmemoryStorage.Transaction().GetAll()
-	assert.ElementsMatch(s.T(), persistantTransactions, expectedTransactions)
+	assert.ElementsMatch(s.T(), persistentTransactions, expectedTransactions)
 	assert.ElementsMatch(s.T(), inmemoryTransactions, expectedTransactions)
 }
 
@@ -190,7 +190,7 @@ func (s *TransactionServiceStorageTestSuite) TestDeleteNegative() {
 	tt[0].ID = 10
 
 	err := s.service.Transaction().Delete(tt[0])
-	assert.ErrorContains(s.T(), err, "s.persistantStorage.Delete: total affected rows 0 while expected 1")
+	assert.ErrorContains(s.T(), err, "s.persistentStorage.Delete: total affected rows 0 while expected 1")
 	tt[0].ID = 1 // return real id to proper teardown
 }
 
@@ -208,15 +208,15 @@ func (s *TransactionServiceStorageTestSuite) TestGetAllSorted() {
 }
 
 func (s *TransactionServiceStorageTestSuite) getLinkedPersistantTransactions() []*model.Transaction {
-	persistantTransactions, err := s.persistantStorage.Transaction().GetAll()
+	persistentTransactions, err := s.persistentStorage.Transaction().GetAll()
 	require.NoError(s.T(), err)
 
-	for _, t := range persistantTransactions {
+	for _, t := range persistentTransactions {
 		t.Category = s.service.Category().GetByID(t.Category.ID)
 		t.Account = s.service.Account().GetByID(t.Account.ID)
 	}
 
-	return persistantTransactions
+	return persistentTransactions
 }
 
 func (s *TransactionServiceStorageTestSuite) TearDownTest() {
@@ -226,15 +226,15 @@ func (s *TransactionServiceStorageTestSuite) TearDownTest() {
 			break
 		}
 
-		err := s.persistantStorage.Transaction().Delete(tt[0].ID)
-		require.NoError(s.T(), err, "occured in TearDownTest")
+		err := s.persistentStorage.Transaction().Delete(tt[0].ID)
+		require.NoError(s.T(), err, "occurred in TearDownTest")
 		s.inmemoryStorage.Transaction().Delete(tt[0])
 	}
 }
 
 func (s *TransactionServiceStorageTestSuite) TearDownSuite() {
 	err := s.db.Close()
-	require.NoError(s.T(), err, "occured in TearDownSuite")
+	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
 func TestTransactionServiceStorageTestSuite(t *testing.T) {
