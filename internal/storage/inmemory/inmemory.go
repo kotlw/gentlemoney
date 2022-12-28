@@ -1,7 +1,7 @@
 package inmemory
 
 import (
-	"gentlemoney/internal/model"
+	"github.com/kotlw/gentlemoney/internal/model"
 )
 
 // InmemoryStorage is a facade structure which aggregates all inmemory storages. It is used for convenience.

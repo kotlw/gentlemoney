@@ -2,7 +2,7 @@ package app
 
 import (
 	"fmt"
-	"gentlemoney/config"
+	"github.com/kotlw/gentlemoney/config"
 )
 
 func Run() {

@@ -1,11 +1,10 @@
 package inmemory_test
 
 import (
-	"fmt"
 	"testing"
 
-	"gentlemoney/internal/model"
-	"gentlemoney/internal/storage/inmemory"
+	"github.com/kotlw/gentlemoney/internal/model"
+	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
@@ -34,9 +33,7 @@ func (s *AccountInmemoryStorageTestSuite) TestInsertPositive() {
 	account := &model.Account{ID: 3, Name: "Card3", Currency: model.NewEmptyCurrency()}
 	expectedAccounts := append(s.InitAccounts, account)
 
-	fmt.Println(s.storage.GetAll())
 	s.storage.Insert(account)
-	fmt.Println(s.storage.GetAll())
 
 	assert.ElementsMatch(s.T(), s.storage.GetAll(), expectedAccounts)
 	assert.Equal(s.T(), account, s.storage.GetByID(account.ID))
@@ -44,12 +41,7 @@ func (s *AccountInmemoryStorageTestSuite) TestInsertPositive() {
 }
 
 func (s *AccountInmemoryStorageTestSuite) TestDeletePositive() {
-
-	fmt.Println(s.storage.GetAll())
 	s.storage.Delete(s.InitAccounts[1])
-	fmt.Println(s.storage.GetAll())
-	
-	fmt.Println(s.storage.GetAll())
 	assert.ElementsMatch(s.T(), s.storage.GetAll(), s.InitAccounts[:1])
 }
 

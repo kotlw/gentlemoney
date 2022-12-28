@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"gentlemoney/internal/model"
+	"github.com/kotlw/gentlemoney/internal/model"
 )
 
 // Account is used to acces the persistant storage.

@@ -1,4 +1,4 @@
-module gentlemoney
+module github.com/kotlw/gentlemoney
 
 go 1.19
 

@@ -1,7 +1,7 @@
 package inmemory
 
 import (
-	"gentlemoney/internal/model"
+	"github.com/kotlw/gentlemoney/internal/model"
 )
 
 // Transaction is used to acces inmemory storage.

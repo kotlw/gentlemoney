@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"sort"
 
-	"gentlemoney/internal/model"
-	"gentlemoney/internal/storage/inmemory"
-	"gentlemoney/internal/storage/sqlite"
+	"github.com/kotlw/gentlemoney/internal/model"
+	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
+	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
 )
 
 // accountList is a wrapper to perform sort by model.Account.Name.

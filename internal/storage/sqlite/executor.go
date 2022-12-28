@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"gentlemoney/internal/model"
+	"github.com/kotlw/gentlemoney/internal/model"
 )
 
 // executor is a wrapper for sql.DB.Exec() and sql.DB.Query().

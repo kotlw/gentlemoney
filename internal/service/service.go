@@ -3,8 +3,8 @@ package service
 import (
 	"fmt"
 	
-	"gentlemoney/internal/storage/sqlite"
-	"gentlemoney/internal/storage/inmemory"
+	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
+	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
 )
 
 

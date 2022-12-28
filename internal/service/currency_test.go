@@ -5,10 +5,10 @@ import (
 	"sort"
 	"testing"
 
-	"gentlemoney/internal/model"
-	"gentlemoney/internal/service"
-	"gentlemoney/internal/storage/inmemory"
-	"gentlemoney/internal/storage/sqlite"
+	"github.com/kotlw/gentlemoney/internal/model"
+	"github.com/kotlw/gentlemoney/internal/service"
+	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
+	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"

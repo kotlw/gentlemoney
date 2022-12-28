@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"gentlemoney/internal/model"
-	"gentlemoney/internal/storage/sqlite"
+	"github.com/kotlw/gentlemoney/internal/model"
+	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"

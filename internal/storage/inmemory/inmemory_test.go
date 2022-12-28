@@ -3,7 +3,7 @@ package inmemory_test
 import (
 	"testing"
 
-	"gentlemoney/internal/storage/inmemory"
+	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
 
 	"github.com/stretchr/testify/suite"
 )
