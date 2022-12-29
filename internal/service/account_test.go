@@ -22,7 +22,7 @@ func (cc accountList) Len() int           { return len(cc) }
 func (cc accountList) Less(i, j int) bool { return cc[i].Name < cc[j].Name }
 func (cc accountList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 
-type AccountServiceStorageTestSuite struct {
+type AccountServiceTestSuite struct {
 	suite.Suite
 	db                *sql.DB
 	persistentStorage *sqlite.SqliteStorage
@@ -32,7 +32,7 @@ type AccountServiceStorageTestSuite struct {
 	InitAccounts      []*model.Account
 }
 
-func (s *AccountServiceStorageTestSuite) SetupSuite() {
+func (s *AccountServiceTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
@@ -64,7 +64,7 @@ func (s *AccountServiceStorageTestSuite) SetupSuite() {
 	require.NoError(s.T(), err, "occurred in SetupTest")
 }
 
-func (s *AccountServiceStorageTestSuite) SetupTest() {
+func (s *AccountServiceTestSuite) SetupTest() {
 	for _, a := range s.InitAccounts {
 		_, err := s.persistentStorage.Account().Insert(a)
 		require.NoError(s.T(), err, "occurred in SetupTest")
@@ -74,14 +74,14 @@ func (s *AccountServiceStorageTestSuite) SetupTest() {
 	require.NoError(s.T(), err, "occurred in SetupTest")
 }
 
-func (s *AccountServiceStorageTestSuite) TestLinkage() {
+func (s *AccountServiceTestSuite) TestLinkage() {
 	aa := s.service.Account().GetAll()
 
 	assert.EqualValues(s.T(), s.InitCurrencies[0], aa[0].Currency)
 	assert.EqualValues(s.T(), s.InitCurrencies[1], aa[1].Currency)
 }
 
-func (s *AccountServiceStorageTestSuite) TestInsertPositive() {
+func (s *AccountServiceTestSuite) TestInsertPositive() {
 	account := &model.Account{ID: 3, Name: "Card3", Currency: s.InitCurrencies[1]}
 	expectedAccounts := append(s.InitAccounts, account)
 
@@ -94,12 +94,12 @@ func (s *AccountServiceStorageTestSuite) TestInsertPositive() {
 	assert.ElementsMatch(s.T(), inmemoryAccounts, expectedAccounts)
 }
 
-func (s *AccountServiceStorageTestSuite) TestInsertNegative() {
+func (s *AccountServiceTestSuite) TestInsertNegative() {
 	err := s.service.Account().Insert(s.InitAccounts[0])
 	assert.ErrorContains(s.T(), err, "s.persistentStorage.Insert: e.db.Exec: UNIQUE constraint failed: account.name")
 }
 
-func (s *AccountServiceStorageTestSuite) TestUpdatePositive() {
+func (s *AccountServiceTestSuite) TestUpdatePositive() {
 	aa := s.service.Account().GetAll()
 	aa[0].Name = "Card10"
 
@@ -112,7 +112,7 @@ func (s *AccountServiceStorageTestSuite) TestUpdatePositive() {
 	assert.ElementsMatch(s.T(), persistentAccounts, inmemoryAccounts)
 }
 
-func (s *AccountServiceStorageTestSuite) TestUpdateNegative() {
+func (s *AccountServiceTestSuite) TestUpdateNegative() {
 	aa := s.service.Account().GetAll()
 	aa[0].Name = "Card10"
 	aa[0].ID = 10
@@ -122,7 +122,7 @@ func (s *AccountServiceStorageTestSuite) TestUpdateNegative() {
 	aa[0].ID = 1 // return real id to proper teardown
 }
 
-func (s *AccountServiceStorageTestSuite) TestDeletePositive() {
+func (s *AccountServiceTestSuite) TestDeletePositive() {
 	aa := s.service.Account().GetAll()
 	expectedAccounts := []*model.Account{aa[0]}
 
@@ -135,7 +135,7 @@ func (s *AccountServiceStorageTestSuite) TestDeletePositive() {
 	assert.ElementsMatch(s.T(), inmemoryAccounts, expectedAccounts)
 }
 
-func (s *AccountServiceStorageTestSuite) TestDeleteNegative() {
+func (s *AccountServiceTestSuite) TestDeleteNegative() {
 	aa := s.service.Account().GetAll()
 	aa[0].ID = 10
 
@@ -144,17 +144,17 @@ func (s *AccountServiceStorageTestSuite) TestDeleteNegative() {
 	aa[0].ID = 1 // return real id to proper teardown
 }
 
-func (s *AccountServiceStorageTestSuite) TestGetByID() {
+func (s *AccountServiceTestSuite) TestGetByID() {
 	a := s.service.Account().GetByID(2)
 	assert.Equal(s.T(), s.InitAccounts[1].Name, a.Name)
 }
 
-func (s *AccountServiceStorageTestSuite) TestGetByName() {
+func (s *AccountServiceTestSuite) TestGetByName() {
 	a := s.service.Account().GetByName(s.InitAccounts[1].Name)
 	assert.Equal(s.T(), s.InitCurrencies[1].ID, a.ID)
 }
 
-func (s *AccountServiceStorageTestSuite) TestGetAllSorted() {
+func (s *AccountServiceTestSuite) TestGetAllSorted() {
 	cc := s.service.Account().GetAllSorted()
 	expectedAccounts := make([]*model.Account, len(s.InitAccounts))
 	copy(expectedAccounts, s.InitAccounts)
@@ -162,7 +162,7 @@ func (s *AccountServiceStorageTestSuite) TestGetAllSorted() {
 	assert.ElementsMatch(s.T(), cc, expectedAccounts)
 }
 
-func (s *AccountServiceStorageTestSuite) getLinkedPersistantAccounts() []*model.Account {
+func (s *AccountServiceTestSuite) getLinkedPersistantAccounts() []*model.Account {
 	persistentAccounts, err := s.persistentStorage.Account().GetAll()
 	require.NoError(s.T(), err)
 
@@ -173,7 +173,7 @@ func (s *AccountServiceStorageTestSuite) getLinkedPersistantAccounts() []*model.
 	return persistentAccounts
 }
 
-func (s *AccountServiceStorageTestSuite) TearDownTest() {
+func (s *AccountServiceTestSuite) TearDownTest() {
 	for {
 		aa := s.service.Account().GetAll()
 		if len(aa) == 0 {
@@ -186,11 +186,11 @@ func (s *AccountServiceStorageTestSuite) TearDownTest() {
 	}
 }
 
-func (s *AccountServiceStorageTestSuite) TearDownSuite() {
+func (s *AccountServiceTestSuite) TearDownSuite() {
 	err := s.db.Close()
 	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
-func TestAccountServiceStorageTestSuite(t *testing.T) {
-	suite.Run(t, new(AccountServiceStorageTestSuite))
+func TestAccountServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(AccountServiceTestSuite))
 }

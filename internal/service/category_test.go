@@ -22,7 +22,7 @@ func (cc categoryList) Len() int           { return len(cc) }
 func (cc categoryList) Less(i, j int) bool { return cc[i].Title < cc[j].Title }
 func (cc categoryList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 
-type CategoryServiceStorageTestSuite struct {
+type CategoryServiceTestSuite struct {
 	suite.Suite
 	db                *sql.DB
 	persistentStorage *sqlite.Category
@@ -31,7 +31,7 @@ type CategoryServiceStorageTestSuite struct {
 	InitCategories    []*model.Category
 }
 
-func (s *CategoryServiceStorageTestSuite) SetupSuite() {
+func (s *CategoryServiceTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
@@ -52,7 +52,7 @@ func (s *CategoryServiceStorageTestSuite) SetupSuite() {
 	}
 }
 
-func (s *CategoryServiceStorageTestSuite) SetupTest() {
+func (s *CategoryServiceTestSuite) SetupTest() {
 	for _, c := range s.InitCategories {
 		_, err := s.persistentStorage.Insert(c)
 		require.NoError(s.T(), err, "occurred in SetupTest")
@@ -62,7 +62,7 @@ func (s *CategoryServiceStorageTestSuite) SetupTest() {
 	require.NoError(s.T(), err, "occurred in SetupTest")
 }
 
-func (s *CategoryServiceStorageTestSuite) TestInsertPositive() {
+func (s *CategoryServiceTestSuite) TestInsertPositive() {
 	category := &model.Category{ID: 3, Title: "Sport"}
 	expectedCategories := append(s.InitCategories, category)
 
@@ -76,12 +76,12 @@ func (s *CategoryServiceStorageTestSuite) TestInsertPositive() {
 	assert.ElementsMatch(s.T(), inmemoryCategories, expectedCategories)
 }
 
-func (s *CategoryServiceStorageTestSuite) TestInsertNegative() {
+func (s *CategoryServiceTestSuite) TestInsertNegative() {
 	err := s.service.Insert(s.InitCategories[0])
 	assert.ErrorContains(s.T(), err, "s.persistentStorage.Insert: e.db.Exec: UNIQUE constraint failed: category.title")
 }
 
-func (s *CategoryServiceStorageTestSuite) TestUpdatePositive() {
+func (s *CategoryServiceTestSuite) TestUpdatePositive() {
 	cc := s.service.GetAll()
 	cc[0].Title = "Taxi"
 
@@ -94,7 +94,7 @@ func (s *CategoryServiceStorageTestSuite) TestUpdatePositive() {
 	assert.ElementsMatch(s.T(), persistentCategories, inmemoryCategories)
 }
 
-func (s *CategoryServiceStorageTestSuite) TestUpdateNegative() {
+func (s *CategoryServiceTestSuite) TestUpdateNegative() {
 	cc := s.service.GetAll()
 	cc[0].Title = "Taxi"
 	cc[0].ID = 10
@@ -104,7 +104,7 @@ func (s *CategoryServiceStorageTestSuite) TestUpdateNegative() {
 	cc[0].ID = 1 // return real id to proper teardown
 }
 
-func (s *CategoryServiceStorageTestSuite) TestDeletePositive() {
+func (s *CategoryServiceTestSuite) TestDeletePositive() {
 	cc := s.service.GetAll()
 	expectedCategories := []*model.Category{cc[0]}
 
@@ -118,7 +118,7 @@ func (s *CategoryServiceStorageTestSuite) TestDeletePositive() {
 	assert.ElementsMatch(s.T(), inmemoryCategories, expectedCategories)
 }
 
-func (s *CategoryServiceStorageTestSuite) TestDeleteNegative() {
+func (s *CategoryServiceTestSuite) TestDeleteNegative() {
 	cc := s.service.GetAll()
 	cc[0].ID = 10
 
@@ -127,17 +127,17 @@ func (s *CategoryServiceStorageTestSuite) TestDeleteNegative() {
 	cc[0].ID = 1 // return real id to proper teardown
 }
 
-func (s *CategoryServiceStorageTestSuite) TestGetByID() {
+func (s *CategoryServiceTestSuite) TestGetByID() {
 	c := s.service.GetByID(2)
 	assert.Equal(s.T(), s.InitCategories[1].Title, c.Title)
 }
 
-func (s *CategoryServiceStorageTestSuite) TestGetByTitle() {
+func (s *CategoryServiceTestSuite) TestGetByTitle() {
 	c := s.service.GetByTitle(s.InitCategories[1].Title)
 	assert.Equal(s.T(), s.InitCategories[1].ID, c.ID)
 }
 
-func (s *CategoryServiceStorageTestSuite) TestGetAllSorted() {
+func (s *CategoryServiceTestSuite) TestGetAllSorted() {
 	cc := s.service.GetAllSorted()
 	expectedCategories := make([]*model.Category, len(s.InitCategories))
 	copy(expectedCategories, s.InitCategories)
@@ -145,7 +145,7 @@ func (s *CategoryServiceStorageTestSuite) TestGetAllSorted() {
 	assert.ElementsMatch(s.T(), cc, expectedCategories)
 }
 
-func (s *CategoryServiceStorageTestSuite) TearDownTest() {
+func (s *CategoryServiceTestSuite) TearDownTest() {
 	for {
 		cc := s.service.GetAll()
 		if len(cc) == 0 {
@@ -158,11 +158,11 @@ func (s *CategoryServiceStorageTestSuite) TearDownTest() {
 	}
 }
 
-func (s *CategoryServiceStorageTestSuite) TearDownSuite() {
+func (s *CategoryServiceTestSuite) TearDownSuite() {
 	err := s.db.Close()
 	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
-func TestCategoryServiceStorageTestSuite(t *testing.T) {
-	suite.Run(t, new(CategoryServiceStorageTestSuite))
+func TestCategoryServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(CategoryServiceTestSuite))
 }

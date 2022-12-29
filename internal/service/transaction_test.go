@@ -23,7 +23,7 @@ func (tt transactionList) Len() int           { return len(tt) }
 func (tt transactionList) Less(i, j int) bool { return tt[i].Date.After(tt[j].Date) }
 func (tt transactionList) Swap(i, j int)      { tt[i], tt[j] = tt[j], tt[i] }
 
-type TransactionServiceStorageTestSuite struct {
+type TransactionServiceTestSuite struct {
 	suite.Suite
 	db                *sql.DB
 	persistentStorage *sqlite.SqliteStorage
@@ -35,7 +35,7 @@ type TransactionServiceStorageTestSuite struct {
 	InitTransactions  []*model.Transaction
 }
 
-func (s *TransactionServiceStorageTestSuite) SetupSuite() {
+func (s *TransactionServiceTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
@@ -108,7 +108,7 @@ func (s *TransactionServiceStorageTestSuite) SetupSuite() {
 
 }
 
-func (s *TransactionServiceStorageTestSuite) SetupTest() {
+func (s *TransactionServiceTestSuite) SetupTest() {
 	// init transactions
 	for _, t := range s.InitTransactions {
 		_, err := s.persistentStorage.Transaction().Insert(t)
@@ -119,7 +119,7 @@ func (s *TransactionServiceStorageTestSuite) SetupTest() {
 	require.NoError(s.T(), err, "occurred in SetupTest")
 }
 
-func (s *TransactionServiceStorageTestSuite) TestLinkage() {
+func (s *TransactionServiceTestSuite) TestLinkage() {
 	tt := s.service.Transaction().GetAll()
 
 	assert.EqualValues(s.T(), s.InitCategories[0], tt[0].Category)
@@ -128,7 +128,7 @@ func (s *TransactionServiceStorageTestSuite) TestLinkage() {
 	assert.EqualValues(s.T(), s.InitAccounts[1], tt[1].Account)
 }
 
-func (s *TransactionServiceStorageTestSuite) TestInsertPositive() {
+func (s *TransactionServiceTestSuite) TestInsertPositive() {
 	transaction := &model.Transaction{
 		ID:       3,
 		Date:     time.Date(2022, time.Month(2), 23, 1, 10, 30, 0, time.UTC),
@@ -148,7 +148,7 @@ func (s *TransactionServiceStorageTestSuite) TestInsertPositive() {
 	assert.ElementsMatch(s.T(), inmemoryTransactions, expectedTransactions)
 }
 
-func (s *TransactionServiceStorageTestSuite) TestUpdatePositive() {
+func (s *TransactionServiceTestSuite) TestUpdatePositive() {
 	tt := s.service.Transaction().GetAll()
 	tt[0].Amount = 99102
 	tt[0].Note = "CHANGED"
@@ -162,7 +162,7 @@ func (s *TransactionServiceStorageTestSuite) TestUpdatePositive() {
 	assert.ElementsMatch(s.T(), persistentTransactions, inmemoryTransactions)
 }
 
-func (s *TransactionServiceStorageTestSuite) TestUpdateNegative() {
+func (s *TransactionServiceTestSuite) TestUpdateNegative() {
 	tt := s.service.Transaction().GetAll()
 	tt[0].ID = 10
 	tt[0].Note = "CHANGED"
@@ -172,7 +172,7 @@ func (s *TransactionServiceStorageTestSuite) TestUpdateNegative() {
 	tt[0].ID = 1 // return real id to proper teardown
 }
 
-func (s *TransactionServiceStorageTestSuite) TestDeletePositive() {
+func (s *TransactionServiceTestSuite) TestDeletePositive() {
 	tt := s.service.Transaction().GetAll()
 	expectedTransactions := []*model.Transaction{tt[0]}
 
@@ -185,7 +185,7 @@ func (s *TransactionServiceStorageTestSuite) TestDeletePositive() {
 	assert.ElementsMatch(s.T(), inmemoryTransactions, expectedTransactions)
 }
 
-func (s *TransactionServiceStorageTestSuite) TestDeleteNegative() {
+func (s *TransactionServiceTestSuite) TestDeleteNegative() {
 	tt := s.service.Transaction().GetAll()
 	tt[0].ID = 10
 
@@ -194,12 +194,12 @@ func (s *TransactionServiceStorageTestSuite) TestDeleteNegative() {
 	tt[0].ID = 1 // return real id to proper teardown
 }
 
-func (s *TransactionServiceStorageTestSuite) TestGetByID() {
+func (s *TransactionServiceTestSuite) TestGetByID() {
 	t := s.service.Transaction().GetByID(2)
 	assert.EqualValues(s.T(), s.InitTransactions[1], t)
 }
 
-func (s *TransactionServiceStorageTestSuite) TestGetAllSorted() {
+func (s *TransactionServiceTestSuite) TestGetAllSorted() {
 	tt := s.service.Transaction().GetAllSorted()
 	expectedTransactions := make([]*model.Transaction, len(s.InitTransactions))
 	copy(expectedTransactions, s.InitTransactions)
@@ -207,7 +207,7 @@ func (s *TransactionServiceStorageTestSuite) TestGetAllSorted() {
 	assert.ElementsMatch(s.T(), tt, expectedTransactions)
 }
 
-func (s *TransactionServiceStorageTestSuite) getLinkedPersistantTransactions() []*model.Transaction {
+func (s *TransactionServiceTestSuite) getLinkedPersistantTransactions() []*model.Transaction {
 	persistentTransactions, err := s.persistentStorage.Transaction().GetAll()
 	require.NoError(s.T(), err)
 
@@ -219,7 +219,7 @@ func (s *TransactionServiceStorageTestSuite) getLinkedPersistantTransactions() [
 	return persistentTransactions
 }
 
-func (s *TransactionServiceStorageTestSuite) TearDownTest() {
+func (s *TransactionServiceTestSuite) TearDownTest() {
 	for {
 		tt := s.service.Transaction().GetAll()
 		if len(tt) == 0 {
@@ -232,11 +232,11 @@ func (s *TransactionServiceStorageTestSuite) TearDownTest() {
 	}
 }
 
-func (s *TransactionServiceStorageTestSuite) TearDownSuite() {
+func (s *TransactionServiceTestSuite) TearDownSuite() {
 	err := s.db.Close()
 	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
-func TestTransactionServiceStorageTestSuite(t *testing.T) {
-	suite.Run(t, new(TransactionServiceStorageTestSuite))
+func TestTransactionServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(TransactionServiceTestSuite))
 }

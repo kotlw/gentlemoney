@@ -22,7 +22,7 @@ func (cc currencyList) Len() int           { return len(cc) }
 func (cc currencyList) Less(i, j int) bool { return cc[i].Abbreviation < cc[j].Abbreviation }
 func (cc currencyList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 
-type CurrencyServiceStorageTestSuite struct {
+type CurrencyServiceTestSuite struct {
 	suite.Suite
 	db                *sql.DB
 	persistentStorage *sqlite.Currency
@@ -31,7 +31,7 @@ type CurrencyServiceStorageTestSuite struct {
 	InitCurrencies    []*model.Currency
 }
 
-func (s *CurrencyServiceStorageTestSuite) SetupSuite() {
+func (s *CurrencyServiceTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.db = db
@@ -52,7 +52,7 @@ func (s *CurrencyServiceStorageTestSuite) SetupSuite() {
 	}
 }
 
-func (s *CurrencyServiceStorageTestSuite) SetupTest() {
+func (s *CurrencyServiceTestSuite) SetupTest() {
 	for _, c := range s.InitCurrencies {
 		_, err := s.persistentStorage.Insert(c)
 		require.NoError(s.T(), err, "occurred in SetupTest")
@@ -62,7 +62,7 @@ func (s *CurrencyServiceStorageTestSuite) SetupTest() {
 	require.NoError(s.T(), err, "occurred in SetupTest")
 }
 
-func (s *CurrencyServiceStorageTestSuite) TestInsertPositive() {
+func (s *CurrencyServiceTestSuite) TestInsertPositive() {
 	currency := &model.Currency{ID: 3, Abbreviation: "PLN", ExchangeRate: 200, IsMain: false}
 	expectedCurrencies := append(s.InitCurrencies, currency)
 
@@ -76,12 +76,12 @@ func (s *CurrencyServiceStorageTestSuite) TestInsertPositive() {
 	assert.ElementsMatch(s.T(), inmemoryCurrencies, expectedCurrencies)
 }
 
-func (s *CurrencyServiceStorageTestSuite) TestInsertNegative() {
+func (s *CurrencyServiceTestSuite) TestInsertNegative() {
 	err := s.service.Insert(s.InitCurrencies[0])
 	assert.ErrorContains(s.T(), err, "s.persistentStorage.Insert: e.db.Exec: UNIQUE constraint failed: currency.abbreviation")
 }
 
-func (s *CurrencyServiceStorageTestSuite) TestUpdatePositive() {
+func (s *CurrencyServiceTestSuite) TestUpdatePositive() {
 	cc := s.service.GetAll()
 	cc[0].Abbreviation = "CZN"
 
@@ -94,7 +94,7 @@ func (s *CurrencyServiceStorageTestSuite) TestUpdatePositive() {
 	assert.ElementsMatch(s.T(), persistentCurrencies, inmemoryCurrencies)
 }
 
-func (s *CurrencyServiceStorageTestSuite) TestUpdateNegative() {
+func (s *CurrencyServiceTestSuite) TestUpdateNegative() {
 	cc := s.service.GetAll()
 	cc[0].Abbreviation = "CZN"
 	cc[0].ID = 10
@@ -104,7 +104,7 @@ func (s *CurrencyServiceStorageTestSuite) TestUpdateNegative() {
 	cc[0].ID = 1 // return real id to proper teardown
 }
 
-func (s *CurrencyServiceStorageTestSuite) TestDeletePositive() {
+func (s *CurrencyServiceTestSuite) TestDeletePositive() {
 	cc := s.service.GetAll()
 	expectedCurrencies := []*model.Currency{cc[0]}
 
@@ -118,7 +118,7 @@ func (s *CurrencyServiceStorageTestSuite) TestDeletePositive() {
 	assert.ElementsMatch(s.T(), inmemoryCurrencies, expectedCurrencies)
 }
 
-func (s *CurrencyServiceStorageTestSuite) TestDeleteNegative() {
+func (s *CurrencyServiceTestSuite) TestDeleteNegative() {
 	cc := s.service.GetAll()
 	cc[0].ID = 10
 
@@ -127,17 +127,17 @@ func (s *CurrencyServiceStorageTestSuite) TestDeleteNegative() {
 	cc[0].ID = 1 // return real id to proper teardown
 }
 
-func (s *CurrencyServiceStorageTestSuite) TestGetByID() {
+func (s *CurrencyServiceTestSuite) TestGetByID() {
 	c := s.service.GetByID(2)
 	assert.Equal(s.T(), s.InitCurrencies[1].Abbreviation, c.Abbreviation)
 }
 
-func (s *CurrencyServiceStorageTestSuite) TestGetByAbbreviation() {
+func (s *CurrencyServiceTestSuite) TestGetByAbbreviation() {
 	c := s.service.GetByAbbreviation(s.InitCurrencies[1].Abbreviation)
 	assert.Equal(s.T(), s.InitCurrencies[1].ID, c.ID)
 }
 
-func (s *CurrencyServiceStorageTestSuite) TestGetAllSorted() {
+func (s *CurrencyServiceTestSuite) TestGetAllSorted() {
 	cc := s.service.GetAllSorted()
 	expectedCurrencies := make([]*model.Currency, len(s.InitCurrencies))
 	copy(expectedCurrencies, s.InitCurrencies)
@@ -145,7 +145,7 @@ func (s *CurrencyServiceStorageTestSuite) TestGetAllSorted() {
 	assert.ElementsMatch(s.T(), cc, expectedCurrencies)
 }
 
-func (s *CurrencyServiceStorageTestSuite) TearDownTest() {
+func (s *CurrencyServiceTestSuite) TearDownTest() {
 	for {
 		cc := s.service.GetAll()
 		if len(cc) == 0 {
@@ -158,11 +158,11 @@ func (s *CurrencyServiceStorageTestSuite) TearDownTest() {
 	}
 }
 
-func (s *CurrencyServiceStorageTestSuite) TearDownSuite() {
+func (s *CurrencyServiceTestSuite) TearDownSuite() {
 	err := s.db.Close()
 	require.NoError(s.T(), err, "occurred in TearDownSuite")
 }
 
-func TestCurrencyServiceStorageTestSuite(t *testing.T) {
-	suite.Run(t, new(CurrencyServiceStorageTestSuite))
+func TestCurrencyServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(CurrencyServiceTestSuite))
 }
