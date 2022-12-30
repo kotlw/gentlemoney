@@ -39,12 +39,12 @@ func (p *Transaction) FromMap(m map[string]string) (*model.Transaction, error) {
 
 	date, err := time.Parse("2006-01-02", m["Date"])
 	if err != nil {
-        return nil, fmt.Errorf("time.Parse: %w", err)
+		return nil, fmt.Errorf("time.Parse: %w", err)
 	}
 
 	amount, err := parseMoney(m["Amount"])
 	if err != nil {
-        return nil, fmt.Errorf("parseMoney: %w", err)
+		return nil, fmt.Errorf("parseMoney: %w", err)
 	}
 
 	return &model.Transaction{
@@ -57,9 +57,9 @@ func (p *Transaction) FromMap(m map[string]string) (*model.Transaction, error) {
 }
 
 func (*Transaction) reprAmount(value int64) string {
-    sign := ""
-    if value > 0 {
-        sign = "+"
-    }
-	return sign + reprMoney(value) 
+	sign := ""
+	if value > 0 {
+		sign = "+"
+	}
+	return sign + reprMoney(value)
 }

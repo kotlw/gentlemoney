@@ -1,14 +1,14 @@
 package presenter
 
 import (
-    "fmt"
+	"fmt"
 
 	"github.com/kotlw/gentlemoney/internal/model"
 	"github.com/kotlw/gentlemoney/internal/service"
 )
 
 // Account presenter contains logic related to UI.
-type Account struct{
+type Account struct {
 	currencyService *service.Currency
 }
 
@@ -20,8 +20,8 @@ func NewAccount(currencyService *service.Currency) *Account {
 // ToMap converts model.Account to map[string]string. It doesn't handles ID field.
 func (p *Account) ToMap(a *model.Account) map[string]string {
 	return map[string]string{
-		"Name":        a.Name,
-		"Currency":    a.Currency.Abbreviation,
+		"Name":     a.Name,
+		"Currency": a.Currency.Abbreviation,
 	}
 }
 
@@ -32,7 +32,7 @@ func (p *Account) FromMap(m map[string]string) (*model.Account, error) {
 	}
 
 	return &model.Account{
-		Name: m["Name"],
+		Name:     m["Name"],
 		Currency: p.currencyService.GetByAbbreviation(m["Currency"]),
 	}, nil
 }

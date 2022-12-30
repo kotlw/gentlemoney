@@ -15,7 +15,7 @@ type Service struct {
 	transaction *Transaction
 }
 
-// New returns new Service. 
+// New returns new Service.
 func New(ps *sqlite.SqliteStorage, is *inmemory.InmemoryStorage) (s *Service, err error) {
 	s = &Service{}
 

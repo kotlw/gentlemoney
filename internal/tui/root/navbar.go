@@ -27,7 +27,7 @@ func (tb *navBar) addItem(label string, hint rune) {
 	fmt.Fprintf(tb, `  ["%s"]%c %s[""] `, label, hint, label)
 }
 
-// highlightItem highlights item corresponding to currenctly selected page.
+// highlightItem highlights item corresponding to currently selected page.
 func (tb *navBar) highlightItem(name string) {
 	tb.Highlight(name)
 	tb.ScrollToHighlight()

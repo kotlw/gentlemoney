@@ -26,7 +26,7 @@ type AccountPresenterTestSuite struct {
 func (s *AccountPresenterTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	require.NoError(s.T(), err, "occurred in SetupSuite")
-    s.db = db
+	s.db = db
 
 	currencyPersistentStorage, err := sqlite.NewCurrency(db)
 	require.NoError(s.T(), err, "occurred in SetupSuite")

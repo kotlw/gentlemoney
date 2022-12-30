@@ -191,8 +191,6 @@ func (s *TransactionPresenterTestSuite) TestFromMapPositive() {
 	}
 }
 
-
-
 func (s *TransactionPresenterTestSuite) TestFromMapNegative() {
 	for _, tt := range []struct {
 		name     string
@@ -289,7 +287,6 @@ func (s *TransactionPresenterTestSuite) TestFromMapNegative() {
 			},
 			expected: `checkKeys: key "Note" is missing`,
 		},
-
 	} {
 		s.Run(tt.name, func() {
 			_, err := s.presenter.FromMap(tt.give)
