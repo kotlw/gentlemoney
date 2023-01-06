@@ -1,4 +1,4 @@
-package table
+package ext
 
 import (
 	"sort"
@@ -7,7 +7,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-type DataProvider interface {
+type TableDataProvider interface {
 	GetAll() []map[string]string
 }
 
@@ -15,18 +15,18 @@ type Table struct {
 	*tview.Table
 
 	cols          []string
-	dataProvider  DataProvider
 	orderCol      string
 	reversedOrder bool
+	dataProvider  TableDataProvider
 }
 
-func New(cols []string, dataProvider DataProvider) *Table {
+func NewTable(cols []string, dataProvider TableDataProvider) *Table {
 	t := &Table{
 		Table:         tview.NewTable(),
 		cols:          cols,
-		dataProvider:  dataProvider,
 		orderCol:      "",
 		reversedOrder: false,
+		dataProvider:  dataProvider,
 	}
 
 	t.SetSelectable(true, false)
