@@ -80,6 +80,10 @@ func reprMoney(value int64) string {
 
 // parseMoney parses strings like "13.41" to int64 value of 1341.
 func parseMoney(value string) (int64, error) {
+	multiplier := 1
+	if !strings.Contains(value, ".") {
+		multiplier = 100
+	}
 	value = strings.Replace(value, ".", "", 1)
 
 	res, err := strconv.Atoi(value)
@@ -87,5 +91,5 @@ func parseMoney(value string) (int64, error) {
 		return 0, fmt.Errorf("strconv.Atoi: %w", err)
 	}
 
-	return int64(res), nil
+	return int64(res) * int64(multiplier), nil
 }

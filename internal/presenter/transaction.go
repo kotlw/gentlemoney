@@ -33,7 +33,7 @@ func (p *Transaction) ToMap(t *model.Transaction) map[string]string {
 
 // FromMap parses map[string]string to model.Transaction. It doesn't handles ID field.
 func (p *Transaction) FromMap(m map[string]string) (*model.Transaction, error) {
-	if err := checkKeys(m, []string{"Date", "Account", "Category", "Amount", "Currency", "Note"}); err != nil {
+	if err := checkKeys(m, []string{"Date", "Account", "Category", "Amount", "Note"}); err != nil {
 		return nil, fmt.Errorf("checkKeys: %w", err)
 	}
 
