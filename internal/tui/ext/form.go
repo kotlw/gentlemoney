@@ -66,8 +66,8 @@ func (f *Form) SetFields(m map[string]string) {
 			dropDown.SetOptions(opts, nil).SetCurrentOption(index)
 			continue
 		}
-
 	}
+	f.Form.SetFocus(0)
 }
 
 func (f *Form) GetFields() map[string]string {

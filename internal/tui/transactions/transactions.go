@@ -140,6 +140,7 @@ func (v *View) UpdateFormSubmit() {
 	id, err := strconv.Atoi(ref["ID"])
 	if err != nil {
 		v.ShowError("Internal error: something wrong with getting transaction ID from reference.")
+        return
 	}
 	tr.ID = int64(id)
 
@@ -171,6 +172,7 @@ func (v *View) DeleteModalSubmit() {
 	id, err := strconv.Atoi(ref["ID"])
 	if err != nil {
 		v.ShowError("Internal error: something wrong with getting transaction ID from reference.")
+        return
 	}
 	tr.ID = int64(id)
 

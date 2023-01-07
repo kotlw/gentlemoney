@@ -44,7 +44,8 @@ func (t *Table) SetOrder(orderCol string, reversed bool) *Table {
 }
 
 func (t *Table) GetSelectedRef() map[string]string {
-	return t.GetCell(t.GetSelection()).GetReference().(map[string]string)
+	row, _ := t.GetSelection()
+	return t.GetCell(row, 0).GetReference().(map[string]string)
 }
 
 func (t *Table) Refresh() *Table {
