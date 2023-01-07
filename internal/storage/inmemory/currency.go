@@ -41,11 +41,12 @@ func (s *Currency) Delete(c *model.Currency) {
 	delete(s.currencyByID, c.ID)
 	delete(s.currencyByAbbr, c.Abbreviation)
 
-	if len(s.currencies) == 1 {
-		s.currencies = make([]*model.Currency, 0, 20)
-	} else {
-		i := findIndex(c, s.currencies)
-		s.currencies = append(s.currencies[:i], s.currencies[i+1:]...)
+	for i, cc := range s.currencies {
+		if cc.ID == c.ID {
+			last := len(s.currencies) - 1
+			s.currencies[i] = s.currencies[last]
+			s.currencies = s.currencies[:last]
+		}
 	}
 }
 

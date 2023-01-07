@@ -36,11 +36,12 @@ func (s *Transaction) Insert(t *model.Transaction) {
 func (s *Transaction) Delete(t *model.Transaction) {
 	delete(s.transactionByID, t.ID)
 
-	if len(s.transactions) == 1 {
-		s.transactions = make([]*model.Transaction, 0, 20)
-	} else {
-		i := findIndex(t, s.transactions)
-		s.transactions = append(s.transactions[:i], s.transactions[i+1:]...)
+	for i, tt := range s.transactions {
+		if tt.ID == t.ID {
+			last := len(s.transactions) - 1
+			s.transactions[i] = s.transactions[last]
+			s.transactions = s.transactions[:last]
+		}
 	}
 }
 

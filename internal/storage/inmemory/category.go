@@ -41,11 +41,12 @@ func (s *Category) Delete(c *model.Category) {
 	delete(s.categoryByID, c.ID)
 	delete(s.categoryByTitle, c.Title)
 
-	if len(s.categories) == 1 {
-		s.categories = make([]*model.Category, 0, 20)
-	} else {
-		i := findIndex(c, s.categories)
-		s.categories = append(s.categories[:i], s.categories[i+1:]...)
+	for i, cc := range s.categories {
+		if cc.ID == c.ID {
+			last := len(s.categories) - 1
+			s.categories[i] = s.categories[last]
+			s.categories = s.categories[:last]
+		}
 	}
 }
 

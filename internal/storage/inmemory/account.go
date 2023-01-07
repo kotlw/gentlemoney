@@ -41,11 +41,12 @@ func (s *Account) Delete(a *model.Account) {
 	delete(s.accountByID, a.ID)
 	delete(s.accountByName, a.Name)
 
-	if len(s.accounts) == 1 {
-		s.accounts = make([]*model.Account, 0, 20)
-	} else {
-		i := findIndex(a, s.accounts)
-		s.accounts = append(s.accounts[:i], s.accounts[i+1:]...)
+	for i, aa := range s.accounts {
+		if aa.ID == a.ID {
+			last := len(s.accounts) - 1
+			s.accounts[i] = s.accounts[last]
+			s.accounts = s.accounts[:last]
+		}
 	}
 }
 

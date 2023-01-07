@@ -1,9 +1,5 @@
 package inmemory
 
-import (
-	"github.com/kotlw/gentlemoney/internal/model"
-)
-
 // InmemoryStorage is a facade structure which aggregates all inmemory storages. It is used for convenience.
 type InmemoryStorage struct {
 	category    *Category
@@ -40,14 +36,4 @@ func (s *InmemoryStorage) Account() *Account {
 // Transaction returns transaction inmemory storage.
 func (s *InmemoryStorage) Transaction() *Transaction {
 	return s.transaction
-}
-
-// findIndex returns index of given *T in []*T.
-func findIndex[T model.Any](t *T, tt []*T) int {
-	for i, e := range tt {
-		if t == e {
-			return i
-		}
-	}
-	return -1
 }
