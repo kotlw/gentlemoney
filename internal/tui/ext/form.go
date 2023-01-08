@@ -74,9 +74,9 @@ func (f *Form) GetFields() map[string]string {
 	res := make(map[string]string)
 
 	for label, field := range f.inputFields {
-		res[label] = field.GetText()	
+		res[label] = field.GetText()
 	}
-	
+
 	for label, dropDown := range f.dropDowns {
 		_, res[label] = dropDown.GetCurrentOption()
 	}

@@ -1,7 +1,7 @@
 package transactions
 
 import (
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -59,7 +59,12 @@ func New(service *service.Service, presenter *presenter.Presenter) *View {
 }
 
 func (v *View) ModalHasFocus() bool {
-	return v.createForm.HasFocus()
+	for _, modal := range []tview.Primitive{v.createForm, v.updateForm, v.deleteModal, v.errorModal} {
+		if modal.HasFocus() {
+			return true
+		}
+	}
+	return false
 }
 
 func (v *View) NewForm(title string, submit func(), cancel func(), dataProvider *DataProvider) *ext.Form {
@@ -69,7 +74,7 @@ func (v *View) NewForm(title string, submit func(), cancel func(), dataProvider 
 		AddDropDown("Account", nil, 0, nil).
 		AddInputField("Amount", "", 0, nil, nil).
 		AddInputField("Note", "", 0, nil, nil).
-		AddButton("Create", submit).
+		AddButton(strings.Split(title, " ")[0], submit).
 		AddButton("Cancel", cancel)
 
 	form.SetBorder(true)
@@ -91,16 +96,29 @@ func (v *View) HideCreateForm() {
 	v.Pages.HidePage("createForm")
 }
 
-func (v *View) CreateFormSubmit() {
-	m := v.createForm.GetFields()
+func (v *View) IsValidCreateForm(m map[string]string) bool {
 	value, ok := m["Account"]
 	if !ok || value == "" {
 		v.ShowError("Can't create transaction without account.")
-		return
+		return false
 	}
 	value, ok = m["Category"]
 	if !ok || value == "" {
 		v.ShowError("Can't create transaction without category.")
+		return false
+	}
+	value, ok = m["Amount"]
+	if !ok || value == "" {
+		v.ShowError("Can't create transaction without amount.")
+		return false
+	}
+
+	return true
+}
+
+func (v *View) CreateFormSubmit() {
+	m := v.createForm.GetFields()
+	if !v.IsValidCreateForm(m) {
 		return
 	}
 
@@ -130,19 +148,19 @@ func (v *View) HideUpdateForm() {
 }
 
 func (v *View) UpdateFormSubmit() {
+	m := v.updateForm.GetFields()
+	if !v.IsValidCreateForm(m) {
+		return
+	}
+
 	ref := v.table.GetSelectedRef()
-	tr, err := v.presenter.Transaction().FromMap(ref)
+	m["ID"] = ref["ID"]
+
+	tr, err := v.presenter.Transaction().FromMap(m)
 	if err != nil {
 		v.ShowError("Error parse form: \n" + err.Error())
 		return
 	}
-
-	id, err := strconv.Atoi(ref["ID"])
-	if err != nil {
-		v.ShowError("Internal error: something wrong with getting transaction ID from reference.")
-        return
-	}
-	tr.ID = int64(id)
 
 	if err := v.service.Transaction().Update(tr); err != nil {
 		v.ShowError("Error update transaction: \n" + err.Error())
@@ -168,13 +186,6 @@ func (v *View) DeleteModalSubmit() {
 		v.ShowError("Error parse form: \n" + err.Error())
 		return
 	}
-
-	id, err := strconv.Atoi(ref["ID"])
-	if err != nil {
-		v.ShowError("Internal error: something wrong with getting transaction ID from reference.")
-        return
-	}
-	tr.ID = int64(id)
 
 	if err := v.service.Transaction().Delete(tr); err != nil {
 		v.ShowError("Error update transaction: \n" + err.Error())

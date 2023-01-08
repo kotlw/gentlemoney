@@ -13,7 +13,7 @@ func WrapIntoModal(primitive tview.Primitive, width, height int) *tview.Flex {
 }
 
 func NewModal() *tview.Modal {
-    return tview.NewModal().
+	return tview.NewModal().
 		SetBackgroundColor(tview.Styles.PrimitiveBackgroundColor).
 		SetButtonBackgroundColor(tview.Styles.ContrastBackgroundColor).
 		SetButtonTextColor(tview.Styles.PrimaryTextColor)

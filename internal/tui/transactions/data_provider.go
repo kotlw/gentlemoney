@@ -2,7 +2,6 @@ package transactions
 
 import (
 	"sort"
-	"strconv"
 
 	"github.com/kotlw/gentlemoney/internal/presenter"
 	"github.com/kotlw/gentlemoney/internal/service"
@@ -24,7 +23,6 @@ func (d *DataProvider) GetAll() []map[string]string {
 
 	for i, e := range data {
 		res[i] = d.presenter.Transaction().ToMap(e)
-        res[i]["ID"] = strconv.Itoa(int(e.ID))
 	}
 
 	return res
