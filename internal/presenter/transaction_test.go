@@ -63,6 +63,7 @@ func (s *TransactionPresenterTestSuite) TestToMap() {
 		{
 			name: "Zero",
 			give: &model.Transaction{
+				ID:       int64(1),
 				Date:     time.Date(2020, 5, 6, 11, 45, 04, 0, time.UTC),
 				Account:  s.initAccount,
 				Category: s.initCategory,
@@ -70,6 +71,7 @@ func (s *TransactionPresenterTestSuite) TestToMap() {
 				Note:     "Note1",
 			},
 			expected: map[string]string{
+				"ID":       "1",
 				"Date":     "2020-05-06",
 				"Account":  s.initAccount.Name,
 				"Category": s.initCategory.Title,
@@ -81,6 +83,7 @@ func (s *TransactionPresenterTestSuite) TestToMap() {
 		{
 			name: "PositiveOneDigit",
 			give: &model.Transaction{
+				ID:       int64(1),
 				Date:     time.Date(2020, 5, 6, 11, 45, 04, 0, time.UTC),
 				Account:  s.initAccount,
 				Category: s.initCategory,
@@ -88,6 +91,7 @@ func (s *TransactionPresenterTestSuite) TestToMap() {
 				Note:     "Note1",
 			},
 			expected: map[string]string{
+				"ID":       "1",
 				"Date":     "2020-05-06",
 				"Account":  s.initAccount.Name,
 				"Category": s.initCategory.Title,
@@ -99,6 +103,7 @@ func (s *TransactionPresenterTestSuite) TestToMap() {
 		{
 			name: "PositiveTwoDigits",
 			give: &model.Transaction{
+				ID:       int64(1),
 				Date:     time.Date(2020, 5, 6, 11, 45, 04, 0, time.UTC),
 				Account:  s.initAccount,
 				Category: s.initCategory,
@@ -106,6 +111,7 @@ func (s *TransactionPresenterTestSuite) TestToMap() {
 				Note:     "Note1",
 			},
 			expected: map[string]string{
+				"ID":       "1",
 				"Date":     "2020-05-06",
 				"Account":  s.initAccount.Name,
 				"Category": s.initCategory.Title,
@@ -117,6 +123,7 @@ func (s *TransactionPresenterTestSuite) TestToMap() {
 		{
 			name: "NegativeLongNumber",
 			give: &model.Transaction{
+				ID:       int64(1),
 				Date:     time.Date(2020, 5, 6, 11, 45, 04, 0, time.UTC),
 				Account:  s.initAccount,
 				Category: s.initCategory,
@@ -124,6 +131,7 @@ func (s *TransactionPresenterTestSuite) TestToMap() {
 				Note:     "Note1",
 			},
 			expected: map[string]string{
+				"ID":       "1",
 				"Date":     "2020-05-06",
 				"Account":  s.initAccount.Name,
 				"Category": s.initCategory.Title,
@@ -141,11 +149,31 @@ func (s *TransactionPresenterTestSuite) TestToMap() {
 }
 
 func (s *TransactionPresenterTestSuite) TestFromMapPositive() {
-	for _, tt := range []struct {
+	for _, tc := range []struct {
 		name     string
 		give     map[string]string
 		expected *model.Transaction
 	}{
+		{
+			name: "ExistingID",
+			give: map[string]string{
+                "ID":       "91",
+				"Date":     "2020-05-06",
+				"Account":  s.initAccount.Name,
+				"Category": s.initCategory.Title,
+				"Currency": s.initCurrency.Abbreviation,
+				"Amount":   "0.00",
+				"Note":     "Note1",
+			},
+			expected: &model.Transaction{
+				ID:       int64(91),
+				Date:     time.Date(2020, 5, 6, 0, 0, 0, 0, time.UTC),
+				Account:  s.initAccount,
+				Category: s.initCategory,
+				Amount:   0,
+				Note:     "Note1",
+			},
+		},
 		{
 			name: "ExistingNestedModels",
 			give: map[string]string{
@@ -157,6 +185,7 @@ func (s *TransactionPresenterTestSuite) TestFromMapPositive() {
 				"Note":     "Note1",
 			},
 			expected: &model.Transaction{
+				ID:       int64(0),
 				Date:     time.Date(2020, 5, 6, 0, 0, 0, 0, time.UTC),
 				Account:  s.initAccount,
 				Category: s.initCategory,
@@ -175,6 +204,7 @@ func (s *TransactionPresenterTestSuite) TestFromMapPositive() {
 				"Note":     "Note1",
 			},
 			expected: &model.Transaction{
+				ID:       int64(0),
 				Date:     time.Date(2020, 5, 6, 0, 0, 0, 0, time.UTC),
 				Account:  nil,
 				Category: nil,
@@ -183,16 +213,16 @@ func (s *TransactionPresenterTestSuite) TestFromMapPositive() {
 			},
 		},
 	} {
-		s.Run(tt.name, func() {
-			actual, err := s.presenter.FromMap(tt.give)
+		s.Run(tc.name, func() {
+			actual, err := s.presenter.FromMap(tc.give)
 			require.NoError(s.T(), err)
-			assert.Equal(s.T(), tt.expected, actual)
+			assert.Equal(s.T(), tc.expected, actual)
 		})
 	}
 }
 
 func (s *TransactionPresenterTestSuite) TestFromMapNegative() {
-	for _, tt := range []struct {
+	for _, tc := range []struct {
 		name     string
 		give     map[string]string
 		expected string
@@ -217,7 +247,7 @@ func (s *TransactionPresenterTestSuite) TestFromMapNegative() {
 				"Amount":   "invalid",
 				"Note":     "Note1",
 			},
-			expected: `parseMoney: strconv.Atoi: strconv.Atoi: parsing "invalid": invalid syntax`,
+			expected: `parseMoney: strconv.Atoi: parsing "invalid": invalid syntax`,
 		},
 		{
 			name: "MissingDate",
@@ -242,10 +272,10 @@ func (s *TransactionPresenterTestSuite) TestFromMapNegative() {
 		{
 			name: "MissingCategory",
 			give: map[string]string{
-				"Date":     "2020-05-06",
-				"Account":  s.initAccount.Name,
-				"Amount":   "0.00",
-				"Note":     "Note1",
+				"Date":    "2020-05-06",
+				"Account": s.initAccount.Name,
+				"Amount":  "0.00",
+				"Note":    "Note1",
 			},
 			expected: `checkKeys: key "Category" is missing`,
 		},
@@ -270,9 +300,9 @@ func (s *TransactionPresenterTestSuite) TestFromMapNegative() {
 			expected: `checkKeys: key "Note" is missing`,
 		},
 	} {
-		s.Run(tt.name, func() {
-			_, err := s.presenter.FromMap(tt.give)
-			assert.EqualError(s.T(), err, tt.expected)
+		s.Run(tc.name, func() {
+			_, err := s.presenter.FromMap(tc.give)
+			assert.EqualError(s.T(), err, tc.expected)
 		})
 	}
 }

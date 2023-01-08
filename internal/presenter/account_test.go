@@ -42,7 +42,7 @@ func (s *AccountPresenterTestSuite) SetupSuite() {
 
 func (s *AccountPresenterTestSuite) TestToMap() {
 	account := &model.Account{Name: "Card1", Currency: s.initCurrency}
-	expected := map[string]string{"Name": "Card1", "Currency": s.initCurrency.Abbreviation}
+	expected := map[string]string{"ID": "0", "Name": "Card1", "Currency": s.initCurrency.Abbreviation}
 	actual := s.presenter.ToMap(account)
 	assert.Equal(s.T(), expected, actual)
 }
@@ -53,6 +53,16 @@ func (s *AccountPresenterTestSuite) TestFromMapPositive() {
 		give     map[string]string
 		expected *model.Account
 	}{
+        {
+            name: "ExistingID",
+			give:     map[string]string{"ID": "21", "Name": "Card1", "Currency": "USD"},
+			expected: &model.Account{ID: int64(21), Name: "Card1", Currency: s.initCurrency},
+        },
+        {
+            name: "NotExistingID",
+			give:     map[string]string{"Name": "Card1", "Currency": "USD"},
+			expected: &model.Account{ID: int64(0), Name: "Card1", Currency: s.initCurrency},
+        },
 		{
 			name:     "ExistingCurrency",
 			give:     map[string]string{"Name": "Card1", "Currency": "USD"},

@@ -88,8 +88,21 @@ func parseMoney(value string) (int64, error) {
 
 	res, err := strconv.Atoi(value)
 	if err != nil {
-		return 0, fmt.Errorf("strconv.Atoi: %w", err)
+		return 0, err
 	}
 
 	return int64(res) * int64(multiplier), nil
+}
+
+// getID returns id from given map, returns 0 if key "ID" is missing in map.
+func getID(m map[string]string) (int64, error) {
+	idStr, ok := m["ID"]
+	if !ok {
+		idStr = "0"
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return 0, err
+	}
+    return int64(id), nil
 }
