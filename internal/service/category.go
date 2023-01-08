@@ -67,6 +67,9 @@ func (s *Category) Update(c *model.Category) error {
 	if err := s.persistentStorage.Update(c); err != nil {
 		return fmt.Errorf("s.persistentStorage.Update: %w", err)
 	}
+
+	s.inmemoryStorage.Update(c)
+
 	return nil
 }
 

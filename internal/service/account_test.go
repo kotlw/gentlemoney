@@ -100,15 +100,17 @@ func (s *AccountServiceTestSuite) TestInsertNegative() {
 }
 
 func (s *AccountServiceTestSuite) TestUpdatePositive() {
-	aa := s.service.Account().GetAll()
-	aa[0].Name = "Card10"
+	expectedAccounts := make([]*model.Account, 2)
+	copy(expectedAccounts, s.InitAccounts)
+	expectedAccounts[0].Name = "Card10"
 
-	err := s.service.Account().Update(aa[0])
+	err := s.service.Account().Update(expectedAccounts[0])
 	require.NoError(s.T(), err)
 
 	persistentAccounts := s.getLinkedPersistantAccounts()
 	inmemoryAccounts := s.inmemoryStorage.Account().GetAll()
 	require.NoError(s.T(), err)
+	assert.ElementsMatch(s.T(), expectedAccounts, inmemoryAccounts)
 	assert.ElementsMatch(s.T(), persistentAccounts, inmemoryAccounts)
 }
 

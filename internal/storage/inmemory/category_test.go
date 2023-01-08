@@ -40,6 +40,18 @@ func (s *CategoryInmemoryStorageTestSuite) TestInsertPositive() {
 	assert.Equal(s.T(), category, s.storage.GetByTitle(category.Title))
 }
 
+func (s *CategoryInmemoryStorageTestSuite) TestUpdatePositive() {
+	expectedCategories := make([]*model.Category, 2)
+	copy(expectedCategories, s.InitCategories)
+	expectedCategories[0].Title = "Sport"
+
+	s.storage.Update(expectedCategories[0])
+
+	assert.ElementsMatch(s.T(), s.storage.GetAll(), expectedCategories)
+	assert.Equal(s.T(), expectedCategories[0], s.storage.GetByID(expectedCategories[0].ID))
+	assert.Equal(s.T(), expectedCategories[0], s.storage.GetByTitle(expectedCategories[0].Title))
+}
+
 func (s *CategoryInmemoryStorageTestSuite) TestDeletePositive() {
 	s.storage.Delete(s.InitCategories[1])
 

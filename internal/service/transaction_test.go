@@ -149,16 +149,18 @@ func (s *TransactionServiceTestSuite) TestInsertPositive() {
 }
 
 func (s *TransactionServiceTestSuite) TestUpdatePositive() {
-	tt := s.service.Transaction().GetAll()
-	tt[0].Amount = 99102
-	tt[0].Note = "CHANGED"
+	expectedTransactions := make([]*model.Transaction, 2)
+	copy(expectedTransactions, s.InitTransactions)
+	expectedTransactions[0].Amount = 99102
+	expectedTransactions[0].Note = "CHANGED"
 
-	err := s.service.Transaction().Update(tt[0])
+	err := s.service.Transaction().Update(expectedTransactions[0])
 	require.NoError(s.T(), err)
 
 	persistentTransactions := s.getLinkedPersistantTransactions()
 	inmemoryTransactions := s.inmemoryStorage.Transaction().GetAll()
 	require.NoError(s.T(), err)
+	assert.ElementsMatch(s.T(), expectedTransactions, inmemoryTransactions)
 	assert.ElementsMatch(s.T(), persistentTransactions, inmemoryTransactions)
 }
 

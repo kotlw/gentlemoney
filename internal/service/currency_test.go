@@ -82,15 +82,17 @@ func (s *CurrencyServiceTestSuite) TestInsertNegative() {
 }
 
 func (s *CurrencyServiceTestSuite) TestUpdatePositive() {
-	cc := s.service.GetAll()
-	cc[0].Abbreviation = "CZN"
+	expectedCurrencies := make([]*model.Currency, 2)
+	copy(expectedCurrencies, s.InitCurrencies)
+	expectedCurrencies[0].Abbreviation = "CZN"
 
-	err := s.service.Update(cc[0])
+	err := s.service.Update(expectedCurrencies[0])
 	require.NoError(s.T(), err)
 
 	persistentCurrencies, err := s.persistentStorage.GetAll()
 	inmemoryCurrencies := s.inmemoryStorage.GetAll()
 	require.NoError(s.T(), err)
+	assert.ElementsMatch(s.T(), expectedCurrencies, inmemoryCurrencies)
 	assert.ElementsMatch(s.T(), persistentCurrencies, inmemoryCurrencies)
 }
 

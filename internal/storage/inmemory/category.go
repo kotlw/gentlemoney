@@ -36,6 +36,21 @@ func (s *Category) Insert(c *model.Category) {
 	s.categories = append(s.categories, c)
 }
 
+// Update updates category of inmemory storage.
+func (s *Category) Update(c *model.Category) {
+	delete(s.categoryByTitle, s.categoryByID[c.ID].Title)
+
+	s.categoryByID[c.ID] = c
+	s.categoryByTitle[c.Title] = c
+
+	for i, cc := range s.categories {
+		if cc.ID == c.ID {
+			s.categories[i] = c
+			return
+		}
+	}
+}
+
 // Delete removes category from current inmemory storage.
 func (s *Category) Delete(c *model.Category) {
 	delete(s.categoryByID, c.ID)

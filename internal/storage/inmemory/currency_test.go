@@ -40,6 +40,18 @@ func (s *CurrencyInmemoryStorageTestSuite) TestInsertPositive() {
 	assert.Equal(s.T(), currency, s.storage.GetByAbbreviation(currency.Abbreviation))
 }
 
+func (s *CurrencyInmemoryStorageTestSuite) TestUpdatePositive() {
+	expectedCurrencies := make([]*model.Currency, 2)
+	copy(expectedCurrencies, s.InitCurrencies)
+	expectedCurrencies[0].Abbreviation = "PLN"
+
+	s.storage.Update(expectedCurrencies[0])
+
+	assert.ElementsMatch(s.T(), s.storage.GetAll(), expectedCurrencies)
+	assert.Equal(s.T(), expectedCurrencies[0], s.storage.GetByID(expectedCurrencies[0].ID))
+	assert.Equal(s.T(), expectedCurrencies[0], s.storage.GetByAbbreviation(expectedCurrencies[0].Abbreviation))
+}
+
 func (s *CurrencyInmemoryStorageTestSuite) TestDeletePositive() {
 	s.storage.Delete(s.InitCurrencies[1])
 

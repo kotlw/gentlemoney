@@ -32,6 +32,18 @@ func (s *Transaction) Insert(t *model.Transaction) {
 	s.transactions = append(s.transactions, t)
 }
 
+// Update updates transaction of inmemory storage.
+func (s *Transaction) Update(t *model.Transaction) {
+	s.transactionByID[t.ID] = t
+
+	for i, tt := range s.transactions {
+		if tt.ID == t.ID {
+			s.transactions[i] = t
+			return
+		}
+	}
+}
+
 // Delete removes transaction from current inmemory storage.
 func (s *Transaction) Delete(t *model.Transaction) {
 	delete(s.transactionByID, t.ID)

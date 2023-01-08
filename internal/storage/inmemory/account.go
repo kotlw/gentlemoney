@@ -36,6 +36,21 @@ func (s *Account) Insert(a *model.Account) {
 	s.accounts = append(s.accounts, a)
 }
 
+// Update updates currency of inmemory storage.
+func (s *Account) Update(a *model.Account) {
+	delete(s.accountByName, s.accountByID[a.ID].Name)
+
+	s.accountByID[a.ID] = a
+	s.accountByName[a.Name] = a
+
+	for i, aa := range s.accounts {
+		if aa.ID == a.ID {
+			s.accounts[i] = a
+			return
+		}
+	}
+}
+
 // Delete removes account from current inmemory storage.
 func (s *Account) Delete(a *model.Account) {
 	delete(s.accountByID, a.ID)

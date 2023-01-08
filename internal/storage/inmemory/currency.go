@@ -36,6 +36,21 @@ func (s *Currency) Insert(c *model.Currency) {
 	s.currencies = append(s.currencies, c)
 }
 
+// Update updates currency of inmemory storage.
+func (s *Currency) Update(c *model.Currency) {
+	delete(s.currencyByAbbr, s.currencyByID[c.ID].Abbreviation)
+
+	s.currencyByID[c.ID] = c
+	s.currencyByAbbr[c.Abbreviation] = c
+
+	for i, cc := range s.currencies {
+		if cc.ID == c.ID {
+			s.currencies[i] = c
+			return
+		}
+	}
+}
+
 // Delete removes currency from current inmemory storage.
 func (s *Currency) Delete(c *model.Currency) {
 	delete(s.currencyByID, c.ID)

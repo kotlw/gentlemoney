@@ -67,6 +67,9 @@ func (s *Currency) Update(c *model.Currency) error {
 	if err := s.persistentStorage.Update(c); err != nil {
 		return fmt.Errorf("s.persistentStorage.Update: %w", err)
 	}
+
+	s.inmemoryStorage.Update(c)
+
 	return nil
 }
 

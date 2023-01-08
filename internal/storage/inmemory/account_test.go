@@ -40,6 +40,18 @@ func (s *AccountInmemoryStorageTestSuite) TestInsertPositive() {
 	assert.Equal(s.T(), account, s.storage.GetByName(account.Name))
 }
 
+func (s *AccountInmemoryStorageTestSuite) TestUpdatePositive() {
+	expectedAccounts := make([]*model.Account, 2)
+	copy(expectedAccounts, s.InitAccounts)
+	expectedAccounts[0].Name = "Card100"
+
+	s.storage.Update(expectedAccounts[0])
+
+	assert.ElementsMatch(s.T(), s.storage.GetAll(), expectedAccounts)
+	assert.Equal(s.T(), expectedAccounts[0], s.storage.GetByID(expectedAccounts[0].ID))
+	assert.Equal(s.T(), expectedAccounts[0], s.storage.GetByName(expectedAccounts[0].Name))
+}
+
 func (s *AccountInmemoryStorageTestSuite) TestDeletePositive() {
 	s.storage.Delete(s.InitAccounts[1])
 	assert.ElementsMatch(s.T(), s.storage.GetAll(), s.InitAccounts[:1])

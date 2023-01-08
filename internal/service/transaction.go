@@ -60,33 +60,35 @@ func (s *Transaction) Init(categoryService *Category, accountService *Account) e
 }
 
 // Insert appends transaction to both persistent and inmemory storages.
-func (s *Transaction) Insert(c *model.Transaction) error {
-	id, err := s.persistentStorage.Insert(c)
+func (s *Transaction) Insert(t *model.Transaction) error {
+	id, err := s.persistentStorage.Insert(t)
 	if err != nil {
 		return fmt.Errorf("s.persistentStorage.Insert: %w", err)
 	}
 
-	c.ID = id
-	s.inmemoryStorage.Insert(c)
+	t.ID = id
+	s.inmemoryStorage.Insert(t)
 
 	return nil
 }
 
-// Update updates transaction in persistent storage. Since GetAll returns pointers to inmemory data
-// after update the category we need to update it in persistent storage as well.
-func (s *Transaction) Update(c *model.Transaction) error {
-	if err := s.persistentStorage.Update(c); err != nil {
+// Update updates transaction in persistent and inmemory storages.
+func (s *Transaction) Update(t *model.Transaction) error {
+	if err := s.persistentStorage.Update(t); err != nil {
 		return fmt.Errorf("s.persistentStorage.Update: %w", err)
 	}
+
+	s.inmemoryStorage.Update(t)
+
 	return nil
 }
 
 // Delete deletes transaction from inmemory and persistent storages.
-func (s *Transaction) Delete(c *model.Transaction) error {
-	if err := s.persistentStorage.Delete(c.ID); err != nil {
+func (s *Transaction) Delete(t *model.Transaction) error {
+	if err := s.persistentStorage.Delete(t.ID); err != nil {
 		return fmt.Errorf("s.persistentStorage.Delete: %w", err)
 	}
-	s.inmemoryStorage.Delete(c)
+	s.inmemoryStorage.Delete(t)
 	return nil
 }
 

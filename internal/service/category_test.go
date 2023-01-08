@@ -82,15 +82,17 @@ func (s *CategoryServiceTestSuite) TestInsertNegative() {
 }
 
 func (s *CategoryServiceTestSuite) TestUpdatePositive() {
-	cc := s.service.GetAll()
-	cc[0].Title = "Taxi"
+	expectedCategories := make([]*model.Category, 2)
+	copy(expectedCategories, s.InitCategories)
+	expectedCategories[0].Title = "Taxi"
 
-	err := s.service.Update(cc[0])
+	err := s.service.Update(expectedCategories[0])
 	require.NoError(s.T(), err)
 
 	persistentCategories, err := s.persistentStorage.GetAll()
 	inmemoryCategories := s.inmemoryStorage.GetAll()
 	require.NoError(s.T(), err)
+	assert.ElementsMatch(s.T(), expectedCategories, inmemoryCategories)
 	assert.ElementsMatch(s.T(), persistentCategories, inmemoryCategories)
 }
 

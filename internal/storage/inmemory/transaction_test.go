@@ -61,6 +61,18 @@ func (s *TransactionInmemoryStorageTestSuite) TestInsertPositive() {
 	assert.Equal(s.T(), transaction, s.storage.GetByID(transaction.ID))
 }
 
+func (s *TransactionInmemoryStorageTestSuite) TestUpdatePositive() {
+	expectedTransactions := make([]*model.Transaction, 2)
+	copy(expectedTransactions, s.InitTransactions)
+	expectedTransactions[0].Amount = 911
+	expectedTransactions[0].Note = "newNote"
+
+	s.storage.Update(expectedTransactions[0])
+
+	assert.ElementsMatch(s.T(), s.storage.GetAll(), expectedTransactions)
+	assert.Equal(s.T(), expectedTransactions[0], s.storage.GetByID(expectedTransactions[0].ID))
+}
+
 func (s *TransactionInmemoryStorageTestSuite) TestDeletePositive() {
 	s.storage.Delete(s.InitTransactions[1])
 
