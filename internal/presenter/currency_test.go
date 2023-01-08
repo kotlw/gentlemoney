@@ -30,7 +30,7 @@ func (s *CurrencyPresenterTestSuite) TestToMap() {
 		{
 			name:     "Zero",
 			give:     &model.Currency{Abbreviation: "USD", ExchangeRate: 0, IsMain: true},
-            expected: map[string]string{"ID": "0", "Abbreviation": "USD", "ExchangeRate": "0.00", "IsMain": "*"},
+			expected: map[string]string{"ID": "0", "Abbreviation": "USD", "ExchangeRate": "0.00", "IsMain": "*"},
 		},
 		{
 			name:     "PositiveOneDigit",
@@ -71,16 +71,16 @@ func (s *CurrencyPresenterTestSuite) TestFromMapPositive() {
 		give     map[string]string
 		expected *model.Currency
 	}{
-        {
-            name: "ExistingID",
-            give:     map[string]string{"ID": "99", "Abbreviation": "USD", "ExchangeRate": "0.00", "IsMain": "*"},
-            expected: &model.Currency{ID: int64(99), Abbreviation: "USD", ExchangeRate: 0, IsMain: true},
-        },
-        {
-            name: "NotExistingID",
-            give:     map[string]string{"Abbreviation": "USD", "ExchangeRate": "0.00", "IsMain": "*"},
-            expected: &model.Currency{ID: int64(0), Abbreviation: "USD", ExchangeRate: 0, IsMain: true},
-        },
+		{
+			name:     "ExistingID",
+			give:     map[string]string{"ID": "99", "Abbreviation": "USD", "ExchangeRate": "0.00", "IsMain": "*"},
+			expected: &model.Currency{ID: int64(99), Abbreviation: "USD", ExchangeRate: 0, IsMain: true},
+		},
+		{
+			name:     "NotExistingID",
+			give:     map[string]string{"Abbreviation": "USD", "ExchangeRate": "0.00", "IsMain": "*"},
+			expected: &model.Currency{ID: int64(0), Abbreviation: "USD", ExchangeRate: 0, IsMain: true},
+		},
 		{
 			name:     "Zero",
 			give:     map[string]string{"Abbreviation": "USD", "ExchangeRate": "0.00", "IsMain": "*"},

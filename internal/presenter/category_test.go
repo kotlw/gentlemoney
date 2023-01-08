@@ -23,7 +23,7 @@ func (s *CategoryPresenterTestSuite) SetupSuite() {
 
 func (s *CategoryPresenterTestSuite) TestToMap() {
 	category := &model.Category{Title: "Health"}
-    expected := map[string]string{"ID": "0", "Title": "Health"}
+	expected := map[string]string{"ID": "0", "Title": "Health"}
 	actual := s.presenter.ToMap(category)
 	assert.Equal(s.T(), expected, actual)
 }
@@ -34,24 +34,23 @@ func (s *CategoryPresenterTestSuite) TestFromMapPositive() {
 		give     map[string]string
 		expected *model.Category
 	}{
-        {
-            name: "ExistingID",
-            give: map[string]string{"ID": "91", "Title": "Health"},
-            expected: &model.Category{ID: 91, Title: "Health"},
-        },
-        {
-            name: "NotExistingID",
-            give: map[string]string{"Title": "Health"},
-            expected: &model.Category{ID: 0, Title: "Health"},
-        },
-
-    } {
+		{
+			name:     "ExistingID",
+			give:     map[string]string{"ID": "91", "Title": "Health"},
+			expected: &model.Category{ID: 91, Title: "Health"},
+		},
+		{
+			name:     "NotExistingID",
+			give:     map[string]string{"Title": "Health"},
+			expected: &model.Category{ID: 0, Title: "Health"},
+		},
+	} {
 		s.Run(tc.name, func() {
 			actual, err := s.presenter.FromMap(tc.give)
 			require.NoError(s.T(), err)
 			assert.Equal(s.T(), tc.expected, actual)
 		})
-    }
+	}
 }
 
 func (s *CategoryPresenterTestSuite) TestFromMapNegative() {

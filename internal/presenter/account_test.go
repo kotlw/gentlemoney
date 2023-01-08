@@ -53,16 +53,16 @@ func (s *AccountPresenterTestSuite) TestFromMapPositive() {
 		give     map[string]string
 		expected *model.Account
 	}{
-        {
-            name: "ExistingID",
+		{
+			name:     "ExistingID",
 			give:     map[string]string{"ID": "21", "Name": "Card1", "Currency": "USD"},
 			expected: &model.Account{ID: int64(21), Name: "Card1", Currency: s.initCurrency},
-        },
-        {
-            name: "NotExistingID",
+		},
+		{
+			name:     "NotExistingID",
 			give:     map[string]string{"Name": "Card1", "Currency": "USD"},
 			expected: &model.Account{ID: int64(0), Name: "Card1", Currency: s.initCurrency},
-        },
+		},
 		{
 			name:     "ExistingCurrency",
 			give:     map[string]string{"Name": "Card1", "Currency": "USD"},

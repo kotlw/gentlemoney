@@ -157,7 +157,7 @@ func (s *TransactionPresenterTestSuite) TestFromMapPositive() {
 		{
 			name: "ExistingID",
 			give: map[string]string{
-                "ID":       "91",
+				"ID":       "91",
 				"Date":     "2020-05-06",
 				"Account":  s.initAccount.Name,
 				"Category": s.initCategory.Title,
