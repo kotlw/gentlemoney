@@ -12,6 +12,7 @@ import (
 	"github.com/rivo/tview"
 )
 
+// View is a transactions view.
 type View struct {
 	*tview.Pages
 
@@ -24,6 +25,7 @@ type View struct {
 	errorModal  *tview.Modal
 }
 
+// New returns new transactions view.
 func New(service *service.Service, presenter *presenter.Presenter) *View {
 	v := &View{
 		Pages: tview.NewPages(),
@@ -40,24 +42,25 @@ func New(service *service.Service, presenter *presenter.Presenter) *View {
 	v.AddPage("table", v.table, true, true)
 
 	// create form
-	v.createForm = v.NewForm("Create Transaction", v.CreateFormSubmit, v.HideCreateForm, dataProvider)
+	v.createForm = v.newForm("Create Transaction", v.createFormSubmit, v.hideCreateForm, dataProvider)
 	v.AddPage("createForm", ext.WrapIntoModal(v.createForm, 40, 15), true, false)
 
 	// update form
-	v.updateForm = v.NewForm("Update Transaction", v.UpdateFormSubmit, v.HideUpdateForm, dataProvider)
+	v.updateForm = v.newForm("Update Transaction", v.updateFormSubmit, v.hideUpdateForm, dataProvider)
 	v.AddPage("updateForm", ext.WrapIntoModal(v.updateForm, 40, 15), true, false)
 
 	// delete modal
-	v.deleteModal = ext.NewAskModal("Are you sure?", v.DeleteModalSubmit, v.HideDeleteModal)
+	v.deleteModal = ext.NewAskModal("Are you sure?", v.deleteModalSubmit, v.hideDeleteModal)
 	v.AddPage("deleteModal", v.deleteModal, true, false)
 
 	// error modal
-	v.errorModal = ext.NewErrorModal(v.HideError)
+	v.errorModal = ext.NewErrorModal(v.hideError)
 	v.AddPage("errorModal", v.errorModal, true, false)
 
 	return v
 }
 
+// ModalHasFocus returns true if any of modal is currently on focus.
 func (v *View) ModalHasFocus() bool {
 	for _, modal := range []tview.Primitive{v.createForm, v.updateForm, v.deleteModal, v.errorModal} {
 		if modal.HasFocus() {
@@ -67,157 +70,20 @@ func (v *View) ModalHasFocus() bool {
 	return false
 }
 
-func (v *View) NewForm(title string, submit func(), cancel func(), dataProvider *DataProvider) *ext.Form {
-	form := ext.NewForm(dataProvider).
-		AddInputField("Date", "", 0, nil, nil).
-		AddDropDown("Category", nil, 0, nil).
-		AddDropDown("Account", nil, 0, nil).
-		AddInputField("Amount", "", 0, nil, nil).
-		AddInputField("Note", "", 0, nil, nil).
-		AddButton(strings.Split(title, " ")[0], submit).
-		AddButton("Cancel", cancel)
-
-	form.SetBorder(true)
-	form.SetTitle(title)
-	form.SetCancelFunc(cancel)
-
-	return form
-}
-
-func (v *View) ShowCreateForm() {
-	d := time.Now().Format("2006-01-02")
-	m := map[string]string{"Date": d, "Account": "", "Category": "", "Amount": "", "Note": ""}
-
-	v.createForm.SetFields(m)
-	v.Pages.ShowPage("createForm")
-}
-
-func (v *View) HideCreateForm() {
-	v.Pages.HidePage("createForm")
-}
-
-func (v *View) IsValidCreateForm(m map[string]string) bool {
-	value, ok := m["Account"]
-	if !ok || value == "" {
-		v.ShowError("Can't create transaction without account.")
-		return false
-	}
-	value, ok = m["Category"]
-	if !ok || value == "" {
-		v.ShowError("Can't create transaction without category.")
-		return false
-	}
-	value, ok = m["Amount"]
-	if !ok || value == "" {
-		v.ShowError("Can't create transaction without amount.")
-		return false
-	}
-
-	return true
-}
-
-func (v *View) CreateFormSubmit() {
-	m := v.createForm.GetFields()
-	if !v.IsValidCreateForm(m) {
-		return
-	}
-
-	tr, err := v.presenter.Transaction().FromMap(m)
-	if err != nil {
-		v.ShowError("Error parse form: \n" + err.Error())
-		return
-	}
-
-	if err := v.service.Transaction().Insert(tr); err != nil {
-		v.ShowError("Error insert transaction: \n" + err.Error())
-		return
-	}
-
-	v.table.Refresh()
-	v.HideCreateForm()
-}
-
-func (v *View) ShowUpdateForm() {
-	m := v.table.GetSelectedRef()
-	v.updateForm.SetFields(m)
-	v.Pages.ShowPage("updateForm")
-}
-
-func (v *View) HideUpdateForm() {
-	v.Pages.HidePage("updateForm")
-}
-
-func (v *View) UpdateFormSubmit() {
-	m := v.updateForm.GetFields()
-	if !v.IsValidCreateForm(m) {
-		return
-	}
-
-	ref := v.table.GetSelectedRef()
-	m["ID"] = ref["ID"]
-
-	tr, err := v.presenter.Transaction().FromMap(m)
-	if err != nil {
-		v.ShowError("Error parse form: \n" + err.Error())
-		return
-	}
-
-	if err := v.service.Transaction().Update(tr); err != nil {
-		v.ShowError("Error update transaction: \n" + err.Error())
-		return
-	}
-
-	v.table.Refresh()
-	v.HideUpdateForm()
-}
-
-func (v *View) ShowDeleteModal() {
-	v.Pages.ShowPage("deleteModal")
-}
-
-func (v *View) HideDeleteModal() {
-	v.Pages.HidePage("deleteModal")
-}
-
-func (v *View) DeleteModalSubmit() {
-	ref := v.table.GetSelectedRef()
-	tr, err := v.presenter.Transaction().FromMap(ref)
-	if err != nil {
-		v.ShowError("Error parse form: \n" + err.Error())
-		return
-	}
-
-	if err := v.service.Transaction().Delete(tr); err != nil {
-		v.ShowError("Error update transaction: \n" + err.Error())
-		return
-	}
-
-	v.table.Refresh()
-	v.HideDeleteModal()
-}
-
-func (v *View) ShowError(text string) {
-	v.errorModal.SetText(text)
-	v.Pages.ShowPage("errorModal")
-}
-
-func (v *View) HideError() {
-	v.Pages.HidePage("errorModal")
-}
-
+// InputHandler returns the handler for this primitive.
 func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 	return v.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 		if v.table.HasFocus() {
 			if event.Rune() == 'c' {
-				v.ShowCreateForm()
+				v.showCreateForm()
 			}
 
 			if event.Rune() == 'u' {
-				v.ShowUpdateForm()
+				v.showUpdateForm()
 			}
 
 			if event.Rune() == 'd' {
-				v.ShowDeleteModal()
+				v.showDeleteModal()
 			}
 
 			// if none of keys has pressed use standard table input handler.
@@ -240,4 +106,155 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 		}
 
 	})
+}
+
+// newForm returns new form with corresponding transaction fields.
+func (v *View) newForm(title string, submit func(), cancel func(), dataProvider *DataProvider) *ext.Form {
+	form := ext.NewForm(dataProvider).
+		AddInputField("Date", "", 0, nil, nil).
+		AddDropDown("Category", nil, 0, nil).
+		AddDropDown("Account", nil, 0, nil).
+		AddInputField("Amount", "", 0, nil, nil).
+		AddInputField("Note", "", 0, nil, nil).
+		AddButton(strings.Split(title, " ")[0], submit).
+		AddButton("Cancel", cancel)
+
+	form.SetBorder(true)
+	form.SetTitle(title)
+	form.SetCancelFunc(cancel)
+
+	return form
+}
+
+// showCreateForm shows create form with initialized empty fields.
+func (v *View) showCreateForm() {
+	d := time.Now().Format("2006-01-02")
+	m := map[string]string{"Date": d, "Account": "", "Category": "", "Amount": "", "Note": ""}
+
+	v.createForm.SetFields(m)
+	v.Pages.ShowPage("createForm")
+}
+
+// hideCreateForm hides create form.
+func (v *View) hideCreateForm() {
+	v.Pages.HidePage("createForm")
+}
+
+// isValidCreateForm checks if all necessary fields are filled.
+func (v *View) isValidCreateForm(m map[string]string) bool {
+	value, ok := m["Account"]
+	if !ok || value == "" {
+		v.showError("Can't create transaction without account.")
+		return false
+	}
+	value, ok = m["Category"]
+	if !ok || value == "" {
+		v.showError("Can't create transaction without category.")
+		return false
+	}
+	value, ok = m["Amount"]
+	if !ok || value == "" {
+		v.showError("Can't create transaction without amount.")
+		return false
+	}
+
+	return true
+}
+
+// createFormSubmit create form submit handler.
+func (v *View) createFormSubmit() {
+	m := v.createForm.GetFields()
+	if !v.isValidCreateForm(m) {
+		return
+	}
+
+	tr, err := v.presenter.Transaction().FromMap(m)
+	if err != nil {
+		v.showError("Error parse form: \n" + err.Error())
+		return
+	}
+
+	if err := v.service.Transaction().Insert(tr); err != nil {
+		v.showError("Error insert transaction: \n" + err.Error())
+		return
+	}
+
+	v.table.Refresh()
+	v.hideCreateForm()
+}
+
+// showUpdateForm shows update form with initialized with selected transaction fields.
+func (v *View) showUpdateForm() {
+	m := v.table.GetSelectedRef()
+	v.updateForm.SetFields(m)
+	v.Pages.ShowPage("updateForm")
+}
+
+// hideUpdateForm hides update form.
+func (v *View) hideUpdateForm() {
+	v.Pages.HidePage("updateForm")
+}
+
+// updateFormSubmit update form submit handler.
+func (v *View) updateFormSubmit() {
+	m := v.updateForm.GetFields()
+	if !v.isValidCreateForm(m) {
+		return
+	}
+
+	ref := v.table.GetSelectedRef()
+	m["ID"] = ref["ID"]
+
+	tr, err := v.presenter.Transaction().FromMap(m)
+	if err != nil {
+		v.showError("Error parse form: \n" + err.Error())
+		return
+	}
+
+	if err := v.service.Transaction().Update(tr); err != nil {
+		v.showError("Error update transaction: \n" + err.Error())
+		return
+	}
+
+	v.table.Refresh()
+	v.hideUpdateForm()
+}
+
+// showDeleteModal shows delete modal.
+func (v *View) showDeleteModal() {
+	v.Pages.ShowPage("deleteModal")
+}
+
+// hideDeleteModal hides delete modal.
+func (v *View) hideDeleteModal() {
+	v.Pages.HidePage("deleteModal")
+}
+
+// deleteModalSubmit delete modal submit handler.
+func (v *View) deleteModalSubmit() {
+	ref := v.table.GetSelectedRef()
+	tr, err := v.presenter.Transaction().FromMap(ref)
+	if err != nil {
+		v.showError("Error parse form: \n" + err.Error())
+		return
+	}
+
+	if err := v.service.Transaction().Delete(tr); err != nil {
+		v.showError("Error update transaction: \n" + err.Error())
+		return
+	}
+
+	v.table.Refresh()
+	v.hideDeleteModal()
+}
+
+// showDeleteModal shows error modal.
+func (v *View) showError(text string) {
+	v.errorModal.SetText(text)
+	v.Pages.ShowPage("errorModal")
+}
+
+// hideError hides error modal.
+func (v *View) hideError() {
+	v.Pages.HidePage("errorModal")
 }

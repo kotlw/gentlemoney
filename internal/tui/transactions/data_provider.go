@@ -7,15 +7,18 @@ import (
 	"github.com/kotlw/gentlemoney/internal/service"
 )
 
+// DataProvider implements ext.TableDataProvider and ext.FromDataProvider for interaction with transactions.
 type DataProvider struct {
 	service   *service.Service
 	presenter *presenter.Presenter
 }
 
+// NewDataProvider returns new DataProvider.
 func NewDataProvider(service *service.Service, presenter *presenter.Presenter) *DataProvider {
 	return &DataProvider{service: service, presenter: presenter}
 }
 
+// GetAll returns slice of maps which represents transaction struct.
 func (d *DataProvider) GetAll() []map[string]string {
 	data := d.service.Transaction().GetAll()
 
@@ -28,17 +31,19 @@ func (d *DataProvider) GetAll() []map[string]string {
 	return res
 }
 
+// GetDropDownOptions returns dropdown obtions for given label.
 func (d *DataProvider) GetDropDownOptions(label string) []string {
 	switch label {
 	case "Account":
-		return d.AccountOptions()
+		return d.accountOptions()
 	case "Category":
-		return d.CategoryOptions()
+		return d.categoryOptions()
 	}
 	return nil
 }
 
-func (d *DataProvider) AccountOptions() []string {
+// accountOptions returns account dropdown options.
+func (d *DataProvider) accountOptions() []string {
 	accounts := d.service.Account().GetAll()
 
 	res := make([]string, len(accounts))
@@ -52,7 +57,8 @@ func (d *DataProvider) AccountOptions() []string {
 	return res
 }
 
-func (d *DataProvider) CategoryOptions() []string {
+// categoryOptions returns category dropdown options.
+func (d *DataProvider) categoryOptions() []string {
 	categories := d.service.Category().GetAll()
 
 	res := make([]string, len(categories))

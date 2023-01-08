@@ -7,10 +7,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+// TableDataProvider an interface for table data population.
 type TableDataProvider interface {
 	GetAll() []map[string]string
 }
 
+// Table an extensioun for tview.Table.
 type Table struct {
 	*tview.Table
 
@@ -20,6 +22,7 @@ type Table struct {
 	dataProvider  TableDataProvider
 }
 
+// NewTable returns new extended Table.
 func NewTable(cols []string, dataProvider TableDataProvider) *Table {
 	t := &Table{
 		Table:         tview.NewTable(),
@@ -37,17 +40,20 @@ func NewTable(cols []string, dataProvider TableDataProvider) *Table {
 	return t
 }
 
+// SetOrder sets the order of displayed table data.
 func (t *Table) SetOrder(orderCol string, reversed bool) *Table {
 	t.orderCol = orderCol
 	t.reversedOrder = reversed
 	return t
 }
 
+// GetSelectedRef returns a reference map[string]string of current selected row.
 func (t *Table) GetSelectedRef() map[string]string {
 	row, _ := t.GetSelection()
 	return t.GetCell(row, 0).GetReference().(map[string]string)
 }
 
+// Refresh refreshes the data and redraws the table.
 func (t *Table) Refresh() *Table {
 	t.Clear()
 
@@ -76,6 +82,7 @@ func (t *Table) Refresh() *Table {
 	return t
 }
 
+// sort internal function to perform sorting depending on state. State sets by SetOrder function.
 func (t *Table) sort(s []map[string]string) {
 	if t.orderCol != "" {
 		sort.Slice(s, func(i, j int) bool {

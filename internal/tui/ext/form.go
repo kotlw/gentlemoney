@@ -6,10 +6,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+// FormDataProvider an interface for getting options for dropdown fields.
 type FormDataProvider interface {
 	GetDropDownOptions(label string) []string
 }
 
+// Form an extension for tview.Form. It used to avoid duplication while setting and getting field values.
 type Form struct {
 	*tview.Form
 
@@ -18,6 +20,7 @@ type Form struct {
 	dataProvider FormDataProvider
 }
 
+// NewForm returns new extended Form.
 func NewForm(dataProvider FormDataProvider) *Form {
 	return &Form{
 		Form: tview.NewForm(),
@@ -28,23 +31,27 @@ func NewForm(dataProvider FormDataProvider) *Form {
 	}
 }
 
+// AddInputField adds an input field to the form. For more information read tview.Form.AddInputField doc.
 func (f *Form) AddInputField(label, value string, fieldWidth int, accept func(textToCheck string, lastChar rune) bool, changed func(text string)) *Form {
 	f.Form.AddInputField(label, value, fieldWidth, accept, changed)
 	f.inputFields[label] = f.Form.GetFormItemByLabel(label).(*tview.InputField)
 	return f
 }
 
+// AddDropDown adds a drop-down element to the form. For more information read tview.Form.AddDropDown doc.
 func (f *Form) AddDropDown(label string, options []string, initialOption int, selected func(option string, optionIndex int)) *Form {
 	f.Form.AddDropDown(label, options, initialOption, selected)
 	f.dropDowns[label] = f.Form.GetFormItemByLabel(label).(*tview.DropDown)
 	return f
 }
 
+// AddButton adds a new button to the form. For more information read tview.Form.AddButton doc.
 func (f *Form) AddButton(label string, selected func()) *Form {
 	f.Form.AddButton(label, selected)
 	return f
 }
 
+// SetFields sets fields value from map where key is field label and value is a value.
 func (f *Form) SetFields(m map[string]string) {
 	for label, value := range m {
 
@@ -70,6 +77,7 @@ func (f *Form) SetFields(m map[string]string) {
 	f.Form.SetFocus(0)
 }
 
+// GetFields returns fields values as map of strings where the key is field label.
 func (f *Form) GetFields() map[string]string {
 	res := make(map[string]string)
 
