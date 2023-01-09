@@ -6,6 +6,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/kotlw/gentlemoney/internal/presenter"
 	"github.com/kotlw/gentlemoney/internal/service"
+	"github.com/kotlw/gentlemoney/internal/tui/settings"
 	"github.com/kotlw/gentlemoney/internal/tui/transactions"
 
 	"github.com/rivo/tview"
@@ -18,10 +19,11 @@ type Root struct {
 	navbar       *tview.TextView
 	pages        *tview.Pages
 	transactions *transactions.View
+	settings     *settings.View
 }
 
 // New returns Root.
-func New(service *service.Service, presenter *presenter.Presenter) *Root {
+func New(app *tview.Application, service *service.Service, presenter *presenter.Presenter) *Root {
 	root := &Root{
 		Flex: tview.NewFlex().SetDirection(tview.FlexRow),
 		navbar: tview.NewTextView().
@@ -35,7 +37,9 @@ func New(service *service.Service, presenter *presenter.Presenter) *Root {
 	root.AddItem(root.pages, 0, 16, true)
 
 	root.transactions = transactions.New(service, presenter)
+	root.settings = settings.New(app, service, presenter)
 	root.AddView('1', "Transactions", root.transactions)
+	root.AddView('2', "Settings", root.settings)
 
 	root.SwitchToView("Transactions")
 
@@ -57,7 +61,7 @@ func (r *Root) SwitchToView(name string) {
 
 // IsModalOnTop check if modal of any child view is on top.
 func (r *Root) IsModalOnTop() bool {
-	return r.transactions.ModalHasFocus()
+	return r.transactions.ModalHasFocus() || r.settings.ModalHasFocus()
 }
 
 // InputHandler returns the handler for this primitive.
@@ -65,15 +69,18 @@ func (r *Root) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 	return r.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 		// modal shouldn't be on top, to perform switch view.
 		if !r.IsModalOnTop() {
-			if event.Rune() == '1' {
+			switch event.Rune() {
+			case '1':
 				r.SwitchToView("Transactions")
-
+				return
+			case '2':
+				r.SwitchToView("Settings")
 				return
 			}
 		}
 
 		// if modal is active all other handlers should be ignored except modal handler.
-		for _, view := range []tview.Primitive{r.transactions} {
+		for _, view := range []tview.Primitive{r.transactions, r.settings} {
 			if view.HasFocus() {
 				// give control to the child view.
 				if handler := view.InputHandler(); handler != nil {

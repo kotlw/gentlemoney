@@ -9,8 +9,8 @@ import (
 )
 
 func New(service *service.Service, presenter *presenter.Presenter) *tview.Application {
-	root := root.New(service, presenter)
 	app := tview.NewApplication()
+	root := root.New(app, service, presenter)
 	app.SetRoot(root, true).EnableMouse(false)
 
 	return app

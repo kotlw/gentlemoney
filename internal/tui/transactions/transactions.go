@@ -4,11 +4,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/kotlw/gentlemoney/internal/presenter"
 	"github.com/kotlw/gentlemoney/internal/service"
 	"github.com/kotlw/gentlemoney/internal/tui/ext"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -16,8 +16,9 @@ import (
 type View struct {
 	*tview.Pages
 
-	service     *service.Service
-	presenter   *presenter.Presenter
+	service   *service.Service
+	presenter *presenter.Presenter
+
 	table       *ext.Table
 	createForm  *ext.Form
 	updateForm  *ext.Form
@@ -42,15 +43,15 @@ func New(service *service.Service, presenter *presenter.Presenter) *View {
 	v.AddPage("table", v.table, true, true)
 
 	// create form
-	v.createForm = v.newForm("Create Transaction", v.createFormSubmit, v.hideCreateForm, dataProvider)
+	v.createForm = v.newForm("Create Transaction", v.submitCreateForm, v.hideCreateForm, dataProvider)
 	v.AddPage("createForm", ext.WrapIntoModal(v.createForm, 40, 15), true, false)
 
 	// update form
-	v.updateForm = v.newForm("Update Transaction", v.updateFormSubmit, v.hideUpdateForm, dataProvider)
+	v.updateForm = v.newForm("Update Transaction", v.submitUpdateForm, v.hideUpdateForm, dataProvider)
 	v.AddPage("updateForm", ext.WrapIntoModal(v.updateForm, 40, 15), true, false)
 
 	// delete modal
-	v.deleteModal = ext.NewAskModal("Are you sure?", v.deleteModalSubmit, v.hideDeleteModal)
+	v.deleteModal = ext.NewAskModal("Are you sure?", v.submitDeleteModal, v.hideDeleteModal)
 	v.AddPage("deleteModal", v.deleteModal, true, false)
 
 	// error modal
@@ -161,8 +162,8 @@ func (v *View) isValidCreateForm(m map[string]string) bool {
 	return true
 }
 
-// createFormSubmit create form submit handler.
-func (v *View) createFormSubmit() {
+// submitCreateForm create form submit handler.
+func (v *View) submitCreateForm() {
 	m := v.createForm.GetFields()
 	if !v.isValidCreateForm(m) {
 		return
@@ -195,8 +196,8 @@ func (v *View) hideUpdateForm() {
 	v.Pages.HidePage("updateForm")
 }
 
-// updateFormSubmit update form submit handler.
-func (v *View) updateFormSubmit() {
+// submitUpdateForm update form submit handler.
+func (v *View) submitUpdateForm() {
 	m := v.updateForm.GetFields()
 	if !v.isValidCreateForm(m) {
 		return
@@ -230,8 +231,8 @@ func (v *View) hideDeleteModal() {
 	v.Pages.HidePage("deleteModal")
 }
 
-// deleteModalSubmit delete modal submit handler.
-func (v *View) deleteModalSubmit() {
+// submitDeleteModal delete modal submit handler.
+func (v *View) submitDeleteModal() {
 	ref := v.table.GetSelectedRef()
 	tr, err := v.presenter.Transaction().FromMap(ref)
 	if err != nil {
@@ -248,7 +249,7 @@ func (v *View) deleteModalSubmit() {
 	v.hideDeleteModal()
 }
 
-// showDeleteModal shows error modal.
+// showError shows error modal.
 func (v *View) showError(text string) {
 	v.errorModal.SetText(text)
 	v.Pages.ShowPage("errorModal")
