@@ -21,33 +21,29 @@ type Form struct {
 }
 
 // NewForm returns new extended Form.
-func NewForm(dataProvider FormDataProvider) *Form {
-	return &Form{
-		Form: tview.NewForm(),
+func NewForm(form *tview.Form, dataProvider FormDataProvider) *Form {
+    f := &Form{
+		Form: form,
 
 		inputFields:  make(map[string]*tview.InputField),
 		dropDowns:    make(map[string]*tview.DropDown),
 		dataProvider: dataProvider,
 	}
-}
 
-// AddInputField adds an input field to the form. For more information read tview.Form.AddInputField doc.
-func (f *Form) AddInputField(label, value string, fieldWidth int, accept func(textToCheck string, lastChar rune) bool, changed func(text string)) *Form {
-	f.Form.AddInputField(label, value, fieldWidth, accept, changed)
-	f.inputFields[label] = f.Form.GetFormItemByLabel(label).(*tview.InputField)
-	return f
-}
+    // gather form items into groups
+	for i := 0; i < form.GetFormItemCount(); i++ {
+        item := form.GetFormItem(i)
 
-// AddDropDown adds a drop-down element to the form. For more information read tview.Form.AddDropDown doc.
-func (f *Form) AddDropDown(label string, options []string, initialOption int, selected func(option string, optionIndex int)) *Form {
-	f.Form.AddDropDown(label, options, initialOption, selected)
-	f.dropDowns[label] = f.Form.GetFormItemByLabel(label).(*tview.DropDown)
-	return f
-}
+        inputField, ok := item.(*tview.InputField)
+        if ok {
+            f.inputFields[item.GetLabel()] = inputField     
+        }
+        dropDown, ok := item.(*tview.DropDown)
+        if ok {
+            f.dropDowns[item.GetLabel()] = dropDown
+        }
+	}
 
-// AddButton adds a new button to the form. For more information read tview.Form.AddButton doc.
-func (f *Form) AddButton(label string, selected func()) *Form {
-	f.Form.AddButton(label, selected)
 	return f
 }
 

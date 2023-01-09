@@ -4,11 +4,13 @@ import (
 	"strings"
 
 	"github.com/kotlw/gentlemoney/internal/tui/ext"
+
+	"github.com/rivo/tview"
 )
 
 // newForm returns new form with corresponding account fields.
 func (v *View) newAccountForm(title string, submit func(), cancel func(), dataProvider *AccountDataProvider) *ext.Form {
-	form := ext.NewForm(dataProvider).
+	form := tview.NewForm().
 		AddInputField("Name", "", 0, nil, nil).
 		AddDropDown("Currency", nil, 0, nil).
 		AddButton(strings.Split(title, " ")[0], submit).
@@ -18,7 +20,7 @@ func (v *View) newAccountForm(title string, submit func(), cancel func(), dataPr
 	form.SetTitle(title)
 	form.SetCancelFunc(cancel)
 
-	return form
+	return ext.NewForm(form, dataProvider)
 }
 
 // showAccountCreateForm shows account create form with initialized empty fields.

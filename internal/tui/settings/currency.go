@@ -4,11 +4,13 @@ import (
 	"strings"
 
 	"github.com/kotlw/gentlemoney/internal/tui/ext"
+
+	"github.com/rivo/tview"
 )
 
 // newForm returns new form with corresponding currency fields.
 func (v *View) newCurrencyForm(title string, submit func(), cancel func(), dataProvider *CurrencyDataProvider) *ext.Form {
-	form := ext.NewForm(dataProvider).
+	form := tview.NewForm().
 		AddInputField("Abbreviation", "", 0, nil, nil).
 		AddInputField("ExchangeRate", "", 0, nil, nil).
 		AddButton(strings.Split(title, " ")[0], submit).
@@ -18,7 +20,7 @@ func (v *View) newCurrencyForm(title string, submit func(), cancel func(), dataP
 	form.SetTitle(title)
 	form.SetCancelFunc(cancel)
 
-	return form
+	return ext.NewForm(form, dataProvider)
 }
 
 // showCurrencyCreateForm shows currency create form with initialized empty fields.

@@ -4,11 +4,13 @@ import (
 	"strings"
 
 	"github.com/kotlw/gentlemoney/internal/tui/ext"
+
+	"github.com/rivo/tview"
 )
 
 // newForm returns new form with corresponding category fields.
 func (v *View) newCategoryForm(title string, submit func(), cancel func(), dataProvider *CategoryDataProvider) *ext.Form {
-	form := ext.NewForm(dataProvider).
+	form := tview.NewForm().
 		AddInputField("Title", "", 0, nil, nil).
 		AddButton(strings.Split(title, " ")[0], submit).
 		AddButton("Cancel", cancel)
@@ -17,7 +19,7 @@ func (v *View) newCategoryForm(title string, submit func(), cancel func(), dataP
 	form.SetTitle(title)
 	form.SetCancelFunc(cancel)
 
-	return form
+	return ext.NewForm(form, dataProvider)
 }
 
 // showCategoryCreateForm shows category create form with initialized empty fields.

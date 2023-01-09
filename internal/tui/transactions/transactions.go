@@ -111,7 +111,7 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 
 // newForm returns new form with corresponding transaction fields.
 func (v *View) newForm(title string, submit func(), cancel func(), dataProvider *DataProvider) *ext.Form {
-	form := ext.NewForm(dataProvider).
+	form := tview.NewForm(). 
 		AddInputField("Date", "", 0, nil, nil).
 		AddDropDown("Category", nil, 0, nil).
 		AddDropDown("Account", nil, 0, nil).
@@ -124,7 +124,7 @@ func (v *View) newForm(title string, submit func(), cancel func(), dataProvider 
 	form.SetTitle(title)
 	form.SetCancelFunc(cancel)
 
-	return form
+	return ext.NewForm(form, dataProvider)
 }
 
 // showCreateForm shows create form with initialized empty fields.
