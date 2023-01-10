@@ -2,19 +2,11 @@ package service
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/kotlw/gentlemoney/internal/model"
 	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
 	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
 )
-
-// currencyList is a wrapper to perform sort by model.Currency.Abbreviation.
-type currencyList []*model.Currency
-
-func (cc currencyList) Len() int           { return len(cc) }
-func (cc currencyList) Less(i, j int) bool { return cc[i].Abbreviation < cc[j].Abbreviation }
-func (cc currencyList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 
 // Currency service contains business logic related to model.Currency.
 type Currency struct {
@@ -95,11 +87,4 @@ func (s *Currency) GetByID(id int64) *model.Currency {
 // GetByAbbreviation returns currency by given model.Currency.Abbreviation.
 func (s *Currency) GetByAbbreviation(abbreviation string) *model.Currency {
 	return s.inmemoryStorage.GetByAbbreviation(abbreviation)
-}
-
-// GetAllSorted returns all currencies sorted by model.Currency.Abbreviation.
-func (s *Currency) GetAllSorted() []*model.Currency {
-	cc := s.inmemoryStorage.GetAll()
-	sort.Sort(currencyList(cc))
-	return cc
 }

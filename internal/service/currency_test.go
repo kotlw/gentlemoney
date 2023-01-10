@@ -2,7 +2,6 @@ package service_test
 
 import (
 	"database/sql"
-	"sort"
 	"testing"
 
 	"github.com/kotlw/gentlemoney/internal/model"
@@ -15,12 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
-
-type currencyList []*model.Currency
-
-func (cc currencyList) Len() int           { return len(cc) }
-func (cc currencyList) Less(i, j int) bool { return cc[i].Abbreviation < cc[j].Abbreviation }
-func (cc currencyList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 
 type CurrencyServiceTestSuite struct {
 	suite.Suite
@@ -137,14 +130,6 @@ func (s *CurrencyServiceTestSuite) TestGetByID() {
 func (s *CurrencyServiceTestSuite) TestGetByAbbreviation() {
 	c := s.service.GetByAbbreviation(s.InitCurrencies[1].Abbreviation)
 	assert.Equal(s.T(), s.InitCurrencies[1].ID, c.ID)
-}
-
-func (s *CurrencyServiceTestSuite) TestGetAllSorted() {
-	cc := s.service.GetAllSorted()
-	expectedCurrencies := make([]*model.Currency, len(s.InitCurrencies))
-	copy(expectedCurrencies, s.InitCurrencies)
-	sort.Sort(currencyList(expectedCurrencies))
-	assert.ElementsMatch(s.T(), cc, expectedCurrencies)
 }
 
 func (s *CurrencyServiceTestSuite) TearDownTest() {

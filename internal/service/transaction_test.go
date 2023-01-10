@@ -2,7 +2,6 @@ package service_test
 
 import (
 	"database/sql"
-	"sort"
 	"testing"
 	"time"
 
@@ -16,12 +15,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
-
-type transactionList []*model.Transaction
-
-func (tt transactionList) Len() int           { return len(tt) }
-func (tt transactionList) Less(i, j int) bool { return tt[i].Date.After(tt[j].Date) }
-func (tt transactionList) Swap(i, j int)      { tt[i], tt[j] = tt[j], tt[i] }
 
 type TransactionServiceTestSuite struct {
 	suite.Suite
@@ -199,14 +192,6 @@ func (s *TransactionServiceTestSuite) TestDeleteNegative() {
 func (s *TransactionServiceTestSuite) TestGetByID() {
 	t := s.service.Transaction().GetByID(2)
 	assert.EqualValues(s.T(), s.InitTransactions[1], t)
-}
-
-func (s *TransactionServiceTestSuite) TestGetAllSorted() {
-	tt := s.service.Transaction().GetAllSorted()
-	expectedTransactions := make([]*model.Transaction, len(s.InitTransactions))
-	copy(expectedTransactions, s.InitTransactions)
-	sort.Sort(transactionList(expectedTransactions))
-	assert.ElementsMatch(s.T(), tt, expectedTransactions)
 }
 
 func (s *TransactionServiceTestSuite) getLinkedPersistantTransactions() []*model.Transaction {

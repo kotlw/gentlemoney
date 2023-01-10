@@ -2,7 +2,6 @@ package service_test
 
 import (
 	"database/sql"
-	"sort"
 	"testing"
 
 	"github.com/kotlw/gentlemoney/internal/model"
@@ -15,12 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
-
-type accountList []*model.Account
-
-func (cc accountList) Len() int           { return len(cc) }
-func (cc accountList) Less(i, j int) bool { return cc[i].Name < cc[j].Name }
-func (cc accountList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 
 type AccountServiceTestSuite struct {
 	suite.Suite
@@ -154,14 +147,6 @@ func (s *AccountServiceTestSuite) TestGetByID() {
 func (s *AccountServiceTestSuite) TestGetByName() {
 	a := s.service.Account().GetByName(s.InitAccounts[1].Name)
 	assert.Equal(s.T(), s.InitCurrencies[1].ID, a.ID)
-}
-
-func (s *AccountServiceTestSuite) TestGetAllSorted() {
-	cc := s.service.Account().GetAllSorted()
-	expectedAccounts := make([]*model.Account, len(s.InitAccounts))
-	copy(expectedAccounts, s.InitAccounts)
-	sort.Sort(accountList(expectedAccounts))
-	assert.ElementsMatch(s.T(), cc, expectedAccounts)
 }
 
 func (s *AccountServiceTestSuite) getLinkedPersistantAccounts() []*model.Account {

@@ -22,7 +22,7 @@ type Form struct {
 
 // NewForm returns new extended Form.
 func NewForm(form *tview.Form, dataProvider FormDataProvider) *Form {
-    f := &Form{
+	f := &Form{
 		Form: form,
 
 		inputFields:  make(map[string]*tview.InputField),
@@ -30,18 +30,18 @@ func NewForm(form *tview.Form, dataProvider FormDataProvider) *Form {
 		dataProvider: dataProvider,
 	}
 
-    // gather form items into groups
+	// gather form items into groups
 	for i := 0; i < form.GetFormItemCount(); i++ {
-        item := form.GetFormItem(i)
+		item := form.GetFormItem(i)
 
-        inputField, ok := item.(*tview.InputField)
-        if ok {
-            f.inputFields[item.GetLabel()] = inputField     
-        }
-        dropDown, ok := item.(*tview.DropDown)
-        if ok {
-            f.dropDowns[item.GetLabel()] = dropDown
-        }
+		inputField, ok := item.(*tview.InputField)
+		if ok {
+			f.inputFields[item.GetLabel()] = inputField
+		}
+		dropDown, ok := item.(*tview.DropDown)
+		if ok {
+			f.dropDowns[item.GetLabel()] = dropDown
+		}
 	}
 
 	return f

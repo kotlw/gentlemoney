@@ -128,7 +128,7 @@ func (v *View) ModalHasFocus() bool {
 func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 	return v.WrapInputHandler(func(event *tcell.EventKey, setFocus func(p tview.Primitive)) {
 		if v.categoryTable.HasFocus() {
-			// table controllers 
+			// table controllers
 			switch event.Rune() {
 			case 'c':
 				v.showCategoryCreateForm()
@@ -137,9 +137,9 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			case 'd':
 				v.showCategoryDeleteModal()
 			}
-			
+
 			// navigation between settings
-			switch event.Key(){
+			switch event.Key() {
 			case tcell.KeyTab:
 				v.app.SetFocus(v.currencyTable)
 			case tcell.KeyBacktab:
@@ -154,7 +154,7 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 		}
 
 		if v.currencyTable.HasFocus() {
-			// table controllers 
+			// table controllers
 			switch event.Rune() {
 			case 'c':
 				v.showCurrencyCreateForm()
@@ -165,7 +165,7 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			}
 
 			// navigation between settings
-			switch event.Key(){
+			switch event.Key() {
 			case tcell.KeyTab:
 				v.app.SetFocus(v.accountTable)
 			case tcell.KeyBacktab:
@@ -181,7 +181,7 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 		}
 
 		if v.accountTable.HasFocus() {
-			// table controllers 
+			// table controllers
 			switch event.Rune() {
 			case 'c':
 				v.showAccountCreateForm()
@@ -192,7 +192,7 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			}
 
 			// navigation between settings
-			switch event.Key(){
+			switch event.Key() {
 			case tcell.KeyTab:
 				v.app.SetFocus(v.categoryTable)
 			case tcell.KeyBacktab:

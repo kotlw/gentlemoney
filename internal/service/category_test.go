@@ -2,7 +2,6 @@ package service_test
 
 import (
 	"database/sql"
-	"sort"
 	"testing"
 
 	"github.com/kotlw/gentlemoney/internal/model"
@@ -15,12 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
-
-type categoryList []*model.Category
-
-func (cc categoryList) Len() int           { return len(cc) }
-func (cc categoryList) Less(i, j int) bool { return cc[i].Title < cc[j].Title }
-func (cc categoryList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 
 type CategoryServiceTestSuite struct {
 	suite.Suite
@@ -137,14 +130,6 @@ func (s *CategoryServiceTestSuite) TestGetByID() {
 func (s *CategoryServiceTestSuite) TestGetByTitle() {
 	c := s.service.GetByTitle(s.InitCategories[1].Title)
 	assert.Equal(s.T(), s.InitCategories[1].ID, c.ID)
-}
-
-func (s *CategoryServiceTestSuite) TestGetAllSorted() {
-	cc := s.service.GetAllSorted()
-	expectedCategories := make([]*model.Category, len(s.InitCategories))
-	copy(expectedCategories, s.InitCategories)
-	sort.Sort(categoryList(expectedCategories))
-	assert.ElementsMatch(s.T(), cc, expectedCategories)
 }
 
 func (s *CategoryServiceTestSuite) TearDownTest() {

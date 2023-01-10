@@ -2,19 +2,11 @@ package service
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/kotlw/gentlemoney/internal/model"
 	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
 	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
 )
-
-// transactionList is a wrapper to perform sort by model.Transaction.Date.
-type transactionList []*model.Transaction
-
-func (tt transactionList) Len() int           { return len(tt) }
-func (tt transactionList) Less(i, j int) bool { return tt[i].Date.After(tt[j].Date) }
-func (tt transactionList) Swap(i, j int)      { tt[i], tt[j] = tt[j], tt[i] }
 
 // Transaction service contains business logic related to model.Transaction.
 type Transaction struct {
@@ -100,11 +92,4 @@ func (s *Transaction) GetAll() []*model.Transaction {
 // GetByID returns transaction by given model.Transaction.ID.
 func (s *Transaction) GetByID(id int64) *model.Transaction {
 	return s.inmemoryStorage.GetByID(id)
-}
-
-// GetAllSorted returns all transactions sorted by model.Transaction.Date.
-func (s *Transaction) GetAllSorted() []*model.Transaction {
-	cc := s.inmemoryStorage.GetAll()
-	sort.Sort(transactionList(cc))
-	return cc
 }

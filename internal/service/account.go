@@ -2,19 +2,11 @@ package service
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/kotlw/gentlemoney/internal/model"
 	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
 	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
 )
-
-// accountList is a wrapper to perform sort by model.Account.Name.
-type accountList []*model.Account
-
-func (aa accountList) Len() int           { return len(aa) }
-func (aa accountList) Less(i, j int) bool { return aa[i].Name < aa[j].Name }
-func (aa accountList) Swap(i, j int)      { aa[i], aa[j] = aa[j], aa[i] }
 
 // Account service contains business logic related to model.Account.
 type Account struct {
@@ -106,11 +98,4 @@ func (s *Account) GetByID(id int64) *model.Account {
 // GetByName returns currency by given model.Account.Name.
 func (s *Account) GetByName(name string) *model.Account {
 	return s.inmemoryStorage.GetByName(name)
-}
-
-// GetAllSorted returns all accounts sorted by model.Account.Name.
-func (s *Account) GetAllSorted() []*model.Account {
-	cc := s.inmemoryStorage.GetAll()
-	sort.Sort(accountList(cc))
-	return cc
 }

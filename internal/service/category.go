@@ -2,19 +2,11 @@ package service
 
 import (
 	"fmt"
-	"sort"
 
 	"github.com/kotlw/gentlemoney/internal/model"
 	"github.com/kotlw/gentlemoney/internal/storage/inmemory"
 	"github.com/kotlw/gentlemoney/internal/storage/sqlite"
 )
-
-// categoryList is a wrapper to perform sort by model.Category.Title.
-type categoryList []*model.Category
-
-func (cc categoryList) Len() int           { return len(cc) }
-func (cc categoryList) Less(i, j int) bool { return cc[i].Title < cc[j].Title }
-func (cc categoryList) Swap(i, j int)      { cc[i], cc[j] = cc[j], cc[i] }
 
 // Category service contains business logic related to model.Category.
 type Category struct {
@@ -95,11 +87,4 @@ func (s *Category) GetByID(id int64) *model.Category {
 // GetByTitle returns category by given model.Category.Title.
 func (s *Category) GetByTitle(title string) *model.Category {
 	return s.inmemoryStorage.GetByTitle(title)
-}
-
-// GetAllSorted returns all categories sorted by model.Category.Title.
-func (s *Category) GetAllSorted() []*model.Category {
-	cc := s.inmemoryStorage.GetAll()
-	sort.Sort(categoryList(cc))
-	return cc
 }
