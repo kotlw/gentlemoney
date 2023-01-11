@@ -31,7 +31,7 @@ func (v *View) showCategoryCreateForm() {
 // hideCategoryCreateForm hides category create form.
 func (v *View) hideCategoryCreateForm() {
 	v.Pages.HidePage("categoryCreateForm")
-	v.app.SetFocus(v.categoryTable)
+	v.tuiApp.SetFocus(v.categoryTable)
 }
 
 // isValidCreateForm checks if all necessary fields are filled.
@@ -77,7 +77,7 @@ func (v *View) showCategoryUpdateForm() {
 // hideCategoryUpdateForm hides update form.
 func (v *View) hideCategoryUpdateForm() {
 	v.Pages.HidePage("categoryUpdateForm")
-	v.app.SetFocus(v.categoryTable)
+	v.tuiApp.SetFocus(v.categoryTable)
 }
 
 // submitCategoryUpdateForm update form submit handler.
@@ -113,7 +113,7 @@ func (v *View) showCategoryDeleteModal() {
 // hideCategoryDeleteModal hides delete modal.
 func (v *View) hideCategoryDeleteModal() {
 	v.Pages.HidePage("categoryDeleteModal")
-	v.app.SetFocus(v.categoryTable)
+	v.tuiApp.SetFocus(v.categoryTable)
 }
 
 // submitCategoryDeleteModaldelete modal submit handler.

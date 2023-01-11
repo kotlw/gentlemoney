@@ -32,7 +32,7 @@ func (v *View) showCurrencyCreateForm() {
 // hideCurrencyCreateForm hides currency create form.
 func (v *View) hideCurrencyCreateForm() {
 	v.Pages.HidePage("currencyCreateForm")
-	v.app.SetFocus(v.currencyTable)
+	v.tuiApp.SetFocus(v.currencyTable)
 }
 
 // isValidCreateForm checks if all necessary fields are filled.
@@ -78,7 +78,7 @@ func (v *View) showCurrencyUpdateForm() {
 // hideCurrencyUpdateForm hides update form.
 func (v *View) hideCurrencyUpdateForm() {
 	v.Pages.HidePage("currencyUpdateForm")
-	v.app.SetFocus(v.currencyTable)
+	v.tuiApp.SetFocus(v.currencyTable)
 }
 
 // submitCurrencyUpdateForm update form submit handler.
@@ -114,7 +114,7 @@ func (v *View) showCurrencyDeleteModal() {
 // hideCurrencyDeleteModal hides delete modal.
 func (v *View) hideCurrencyDeleteModal() {
 	v.Pages.HidePage("deleteCurrencyModal")
-	v.app.SetFocus(v.currencyTable)
+	v.tuiApp.SetFocus(v.currencyTable)
 }
 
 // submitCurrencyDeleteModaldelete modal submit handler.

@@ -13,7 +13,7 @@ import (
 type View struct {
 	*tview.Pages
 
-	app       *tview.Application
+	tuiApp    *tview.Application
 	service   *service.Service
 	presenter *presenter.Presenter
 
@@ -38,11 +38,11 @@ type View struct {
 }
 
 // New returns new settings view.
-func New(app *tview.Application, service *service.Service, presenter *presenter.Presenter) *View {
+func New(tuiApp *tview.Application, service *service.Service, presenter *presenter.Presenter) *View {
 	v := &View{
 		Pages: tview.NewPages(),
 
-		app:       app,
+		tuiApp:    tuiApp,
 		service:   service,
 		presenter: presenter,
 		flex:      tview.NewFlex(),
@@ -141,9 +141,9 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			// navigation between settings
 			switch event.Key() {
 			case tcell.KeyTab:
-				v.app.SetFocus(v.currencyTable)
+				v.tuiApp.SetFocus(v.currencyTable)
 			case tcell.KeyBacktab:
-				v.app.SetFocus(v.accountTable)
+				v.tuiApp.SetFocus(v.accountTable)
 			}
 
 			// if none of keys has pressed use standard table input handler.
@@ -167,9 +167,9 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			// navigation between settings
 			switch event.Key() {
 			case tcell.KeyTab:
-				v.app.SetFocus(v.accountTable)
+				v.tuiApp.SetFocus(v.accountTable)
 			case tcell.KeyBacktab:
-				v.app.SetFocus(v.categoryTable)
+				v.tuiApp.SetFocus(v.categoryTable)
 			}
 
 			// if none of keys has pressed use standard table input handler.
@@ -194,9 +194,9 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			// navigation between settings
 			switch event.Key() {
 			case tcell.KeyTab:
-				v.app.SetFocus(v.categoryTable)
+				v.tuiApp.SetFocus(v.categoryTable)
 			case tcell.KeyBacktab:
-				v.app.SetFocus(v.currencyTable)
+				v.tuiApp.SetFocus(v.currencyTable)
 			}
 
 			// if none of keys has pressed use standard table input handler.

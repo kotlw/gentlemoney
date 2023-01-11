@@ -32,7 +32,7 @@ func (v *View) showAccountCreateForm() {
 // hideAccountCreateForm hides account create form.
 func (v *View) hideAccountCreateForm() {
 	v.Pages.HidePage("accountCreateForm")
-	v.app.SetFocus(v.accountTable)
+	v.tuiApp.SetFocus(v.accountTable)
 }
 
 // isValidCreateForm checks if all necessary fields are filled.
@@ -84,7 +84,7 @@ func (v *View) showAccountUpdateForm() {
 // hideAccountUpdateForm hides update form.
 func (v *View) hideAccountUpdateForm() {
 	v.Pages.HidePage("accountUpdateForm")
-	v.app.SetFocus(v.accountTable)
+	v.tuiApp.SetFocus(v.accountTable)
 }
 
 // submitAccountUpdateForm update form submit handler.
@@ -120,7 +120,7 @@ func (v *View) showAccountDeleteModal() {
 // hideAccountDeleteModal hides delete modal.
 func (v *View) hideAccountDeleteModal() {
 	v.Pages.HidePage("accountDeleteModal")
-	v.app.SetFocus(v.accountTable)
+	v.tuiApp.SetFocus(v.accountTable)
 }
 
 // submitAccountDeleteModaldelete modal submit handler.
