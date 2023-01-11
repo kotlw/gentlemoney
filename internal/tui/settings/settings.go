@@ -55,7 +55,7 @@ func New(tuiApp *tview.Application, service *service.Service, presenter *present
 
 	// table
 	v.categoryTable = ext.NewTable([]string{"Title"}, categoryDataProvider).SetOrder("Title", false).Refresh()
-	v.currencyTable = ext.NewTable([]string{"Abbreviation", "ExchangeRate"}, currencyDataProvider).SetOrder("Abbreviation", false).Refresh()
+	v.currencyTable = ext.NewTable([]string{"Abbreviation"}, currencyDataProvider).SetOrder("Abbreviation", false).Refresh()
 	v.accountTable = ext.NewTable([]string{"Name", "Currency"}, accountDataProvider).SetOrder("Name", false).Refresh()
 	v.categoryTable.SetTitle("Category")
 	v.currencyTable.SetTitle("Currency")
@@ -70,7 +70,7 @@ func New(tuiApp *tview.Application, service *service.Service, presenter *present
 	v.currencyCreateForm = v.newCurrencyForm("Create Currency", v.submitCurrencyCreateForm, v.hideCurrencyCreateForm, currencyDataProvider)
 	v.accountCreateForm = v.newAccountForm("Create Account", v.submitAccountCreateForm, v.hideAccountCreateForm, accountDataProvider)
 	v.AddPage("categoryCreateForm", ext.WrapIntoModal(v.categoryCreateForm, 40, 7), true, false)
-	v.AddPage("currencyCreateForm", ext.WrapIntoModal(v.currencyCreateForm, 40, 9), true, false)
+	v.AddPage("currencyCreateForm", ext.WrapIntoModal(v.currencyCreateForm, 40, 7), true, false)
 	v.AddPage("accountCreateForm", ext.WrapIntoModal(v.accountCreateForm, 40, 9), true, false)
 
 	// update form
@@ -78,7 +78,7 @@ func New(tuiApp *tview.Application, service *service.Service, presenter *present
 	v.currencyUpdateForm = v.newCurrencyForm("Update Currency", v.submitCurrencyUpdateForm, v.hideCurrencyUpdateForm, currencyDataProvider)
 	v.accountUpdateForm = v.newAccountForm("Update Account", v.submitAccountUpdateForm, v.hideAccountUpdateForm, accountDataProvider)
 	v.AddPage("categoryUpdateForm", ext.WrapIntoModal(v.categoryUpdateForm, 40, 7), true, false)
-	v.AddPage("currencyUpdateForm", ext.WrapIntoModal(v.currencyUpdateForm, 40, 9), true, false)
+	v.AddPage("currencyUpdateForm", ext.WrapIntoModal(v.currencyUpdateForm, 40, 7), true, false)
 	v.AddPage("accountUpdateForm", ext.WrapIntoModal(v.accountUpdateForm, 40, 9), true, false)
 
 	// delete modal

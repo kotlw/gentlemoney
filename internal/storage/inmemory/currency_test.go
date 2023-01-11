@@ -20,8 +20,8 @@ type CurrencyInmemoryStorageTestSuite struct {
 func (s *CurrencyInmemoryStorageTestSuite) SetupSuite() {
 	s.storage = inmemory.NewCurrency()
 	s.InitCurrencies = []*model.Currency{
-		{ID: 1, Abbreviation: "USD", ExchangeRate: 100, IsMain: true},
-		{ID: 2, Abbreviation: "EUR", ExchangeRate: 124, IsMain: false},
+		{ID: 1, Abbreviation: "USD"},
+		{ID: 2, Abbreviation: "EUR"},
 	}
 }
 
@@ -30,7 +30,7 @@ func (s *CurrencyInmemoryStorageTestSuite) SetupTest() {
 }
 
 func (s *CurrencyInmemoryStorageTestSuite) TestInsertPositive() {
-	currency := &model.Currency{ID: 3, Abbreviation: "PLN", ExchangeRate: 200, IsMain: false}
+	currency := &model.Currency{ID: 3, Abbreviation: "PLN"}
 	expectedCurrencies := append(s.InitCurrencies, currency)
 
 	s.storage.Insert(currency)

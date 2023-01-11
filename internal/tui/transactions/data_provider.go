@@ -25,7 +25,14 @@ func (d *DataProvider) GetAll() []map[string]string {
 	res := make([]map[string]string, len(data))
 
 	for i, e := range data {
-		res[i] = d.presenter.Transaction().ToMap(e)
+		m := d.presenter.Transaction().ToMap(e)
+		if m["Amount"][0] == '+' {
+			m["Amount"] = "[green]" + m["Amount"] + "[white]"
+		}
+		if m["Amount"][0] == '-' {
+			m["Amount"] = "[red]" + m["Amount"] + "[white]"
+		}
+		res[i] = m
 	}
 
 	return res

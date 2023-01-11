@@ -35,7 +35,7 @@ func (s *AccountPresenterTestSuite) SetupSuite() {
 	require.NoError(s.T(), err, "occurred in SetupSuite")
 	s.presenter = presenter.NewAccount(currencyService)
 
-	s.initCurrency = &model.Currency{Abbreviation: "USD", ExchangeRate: 100, IsMain: true}
+	s.initCurrency = &model.Currency{Abbreviation: "USD"}
 	err = currencyService.Insert(s.initCurrency)
 	require.NoError(s.T(), err, "occurred in SetupSuite")
 }

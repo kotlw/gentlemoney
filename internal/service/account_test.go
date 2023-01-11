@@ -39,8 +39,8 @@ func (s *AccountServiceTestSuite) SetupSuite() {
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
 	s.InitCurrencies = []*model.Currency{
-		{ID: 1, Abbreviation: "USD", ExchangeRate: 100, IsMain: true},
-		{ID: 2, Abbreviation: "EUR", ExchangeRate: 124, IsMain: false},
+		{ID: 1, Abbreviation: "USD"},
+		{ID: 2, Abbreviation: "EUR"},
 	}
 	s.InitAccounts = []*model.Account{
 		{ID: 1, Name: "BCard1", Currency: s.InitCurrencies[0]},

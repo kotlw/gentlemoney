@@ -12,7 +12,6 @@ import (
 func (v *View) newCurrencyForm(title string, submit func(), cancel func(), dataProvider *CurrencyDataProvider) *ext.Form {
 	form := tview.NewForm().
 		AddInputField("Abbreviation", "", 0, nil, nil).
-		AddInputField("ExchangeRate", "", 0, nil, nil).
 		AddButton(strings.Split(title, " ")[0], submit).
 		AddButton("Cancel", cancel)
 
@@ -25,7 +24,7 @@ func (v *View) newCurrencyForm(title string, submit func(), cancel func(), dataP
 
 // showCurrencyCreateForm shows currency create form with initialized empty fields.
 func (v *View) showCurrencyCreateForm() {
-	v.currencyCreateForm.SetFields(map[string]string{"Abbreviation": "", "ExchangeRate": ""})
+	v.currencyCreateForm.SetFields(map[string]string{"Abbreviation": ""})
 	v.Pages.ShowPage("currencyCreateForm")
 }
 

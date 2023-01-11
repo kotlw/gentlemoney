@@ -45,7 +45,7 @@ func (s *TransactionPresenterTestSuite) SetupSuite() {
 	err = service.Category().Insert(s.initCategory)
 	require.NoError(s.T(), err, "occurred in SetupSuite")
 
-	s.initCurrency = &model.Currency{Abbreviation: "USD", ExchangeRate: 100, IsMain: true}
+	s.initCurrency = &model.Currency{Abbreviation: "USD"}
 	err = service.Currency().Insert(s.initCurrency)
 	require.NoError(s.T(), err, "occurred in SetupSuite")
 

@@ -4,7 +4,6 @@ package model
 type Currency struct {
 	ID           int64
 	Abbreviation string
-	ExchangeRate int64
 	IsMain       bool
 }
 

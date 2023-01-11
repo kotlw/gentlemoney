@@ -31,23 +31,22 @@ func (s *CurrencySqliteStorageTestSuite) SetupSuite() {
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
 	s.InitCurrencies = []*model.Currency{
-		{ID: 1, Abbreviation: "USD", ExchangeRate: 100, IsMain: true},
-		{ID: 2, Abbreviation: "EUR", ExchangeRate: 124, IsMain: false},
-	}
+        {ID: 1, Abbreviation: "USD"},
+        {ID: 2, Abbreviation: "EUR"}}
 }
 
 func (s *CurrencySqliteStorageTestSuite) SetupTest() {
-	stmt, err := s.db.Prepare(`INSERT INTO currency(abbreviation, exchangeRate, isMain) VALUES (?, ?, ?);`)
+	stmt, err := s.db.Prepare(`INSERT INTO currency(abbreviation) VALUES (?);`)
 	require.NoError(s.T(), err, "occurred in SetupTest")
 
 	for _, currency := range s.InitCurrencies {
-		_, err := stmt.Exec(currency.Abbreviation, currency.ExchangeRate, currency.IsMain)
+		_, err := stmt.Exec(currency.Abbreviation)
 		require.NoError(s.T(), err, "occurred in SetupTest")
 	}
 }
 
 func (s *CurrencySqliteStorageTestSuite) TestInsertPositive() {
-	currency := &model.Currency{ID: 3, Abbreviation: "PLN", ExchangeRate: 200, IsMain: false}
+	currency := &model.Currency{ID: 3, Abbreviation: "PLN"}
 	expectedCurrencies := append(s.InitCurrencies, currency)
 
 	_, err := s.storage.Insert(currency)
@@ -95,7 +94,7 @@ func (s *CurrencySqliteStorageTestSuite) TestGetAll() {
 }
 
 func (s *CurrencySqliteStorageTestSuite) fetchActualData() []*model.Currency {
-	rows, err := s.db.Query(`SELECT id, abbreviation, exchangeRate, isMain FROM currency;`)
+	rows, err := s.db.Query(`SELECT id, abbreviation FROM currency;`)
 	require.NoError(s.T(), err)
 	defer func() {
 		err = rows.Close()
@@ -105,7 +104,7 @@ func (s *CurrencySqliteStorageTestSuite) fetchActualData() []*model.Currency {
 	res := make([]*model.Currency, 0, 3)
 	for rows.Next() {
 		t := model.NewEmptyCurrency()
-		err = rows.Scan(&t.ID, &t.Abbreviation, &t.ExchangeRate, &t.IsMain)
+		err = rows.Scan(&t.ID, &t.Abbreviation)
 		require.NoError(s.T(), err)
 		res = append(res, t)
 	}

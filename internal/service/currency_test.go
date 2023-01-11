@@ -40,8 +40,8 @@ func (s *CurrencyServiceTestSuite) SetupSuite() {
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
 	s.InitCurrencies = []*model.Currency{
-		{ID: 1, Abbreviation: "USD", ExchangeRate: 100, IsMain: true},
-		{ID: 2, Abbreviation: "EUR", ExchangeRate: 124, IsMain: false},
+		{ID: 1, Abbreviation: "USD"},
+		{ID: 2, Abbreviation: "EUR"},
 	}
 }
 
@@ -56,7 +56,7 @@ func (s *CurrencyServiceTestSuite) SetupTest() {
 }
 
 func (s *CurrencyServiceTestSuite) TestInsertPositive() {
-	currency := &model.Currency{ID: 3, Abbreviation: "PLN", ExchangeRate: 200, IsMain: false}
+	currency := &model.Currency{ID: 3, Abbreviation: "PLN"}
 	expectedCurrencies := append(s.InitCurrencies, currency)
 
 	err := s.service.Insert(currency)
