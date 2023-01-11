@@ -20,7 +20,9 @@ type (
 
 	// Logger - logger config.
 	Logger struct {
-		Level string
+		Path     string
+		Filename string
+		Level    string
 	}
 
 	// Storage - storage config.
@@ -37,6 +39,17 @@ func overwriteStrIfEnv(targetValue *string, envKey string) {
 }
 
 func postprocess(c *Config) {
+	// Logger path
+	overwriteStrIfEnv(&c.Logger.Path, "GMON_DATA_DIR")
+	c.Logger.Path = os.ExpandEnv(c.Logger.Path) + "/logs"
+	overwriteStrIfEnv(&c.Logger.Path, "GMON_LOG_DIR")
+	c.Logger.Path = os.ExpandEnv(c.Logger.Path)
+
+	// Logger level
+	overwriteStrIfEnv(&c.Logger.Level, "GMON_LOG")
+	c.Logger.Level = os.ExpandEnv(c.Logger.Level)
+
+	// Storage path
 	overwriteStrIfEnv(&c.Storage.Path, "GMON_DATA_DIR")
 	c.Storage.Path = os.ExpandEnv(c.Storage.Path)
 }

@@ -16,3 +16,4 @@
 
 # Database testing file
 data.sqlite3
+/logs
