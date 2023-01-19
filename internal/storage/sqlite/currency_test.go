@@ -31,8 +31,8 @@ func (s *CurrencySqliteStorageTestSuite) SetupSuite() {
 	// id's settled by sqlite on insert incrementally starting from 1,
 	// so here they are initialized for match purpose
 	s.InitCurrencies = []*model.Currency{
-        {ID: 1, Abbreviation: "USD"},
-        {ID: 2, Abbreviation: "EUR"}}
+		{ID: 1, Abbreviation: "USD"},
+		{ID: 2, Abbreviation: "EUR"}}
 }
 
 func (s *CurrencySqliteStorageTestSuite) SetupTest() {

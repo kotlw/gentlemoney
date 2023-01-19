@@ -3,6 +3,7 @@ package app
 import (
 	"database/sql"
 	"fmt"
+	"os"
 	"path"
 
 	"github.com/kotlw/gentlemoney/config"
@@ -24,7 +25,12 @@ func Run() {
 	log.Debug("Config has initialized.")
 
 	// DB connection
+	err := os.MkdirAll(cfg.Storage.Path, os.ModePerm)
+	if err != nil {
+		log.WithField("path", cfg.Storage.Path).Info(fmt.Errorf("Failed to create floder: %w", err))
+	}
 	p := path.Join(cfg.Storage.Path, cfg.Storage.Filename)
+
 	db, err := sql.Open("sqlite3", p)
 	if err != nil {
 		log.Fatal(fmt.Errorf("app: Run: sql.Open: %w", err))
