@@ -3,6 +3,7 @@ package transactions
 import (
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/kotlw/gentlemoney/internal/presenter"
 	"github.com/kotlw/gentlemoney/internal/service"
@@ -116,7 +117,7 @@ func (v *View) newForm(title string, submit func(), cancel func(), dataProvider 
 		AddFormItem(ext.NewDateField().SetLabel("Date")).
 		AddDropDown("Category", nil, 0, nil).
 		AddDropDown("Account", nil, 0, nil).
-		AddInputField("Amount", "", 0, nil, nil).
+		AddInputField("Amount", "", 0, v.amountAccept, nil).
 		AddInputField("Note", "", 0, nil, nil).
 		AddButton(strings.Split(title, " ")[0], submit).
 		AddButton("Cancel", cancel)
@@ -126,6 +127,27 @@ func (v *View) newForm(title string, submit func(), cancel func(), dataProvider 
 	form.SetCancelFunc(cancel)
 
 	return ext.NewForm(form, dataProvider)
+}
+
+func (v *View) amountAccept(textToCheck string, lastChar rune) bool {
+	amountField := v.createForm.GetFormItem(3).(*tview.InputField)
+	if lastChar == '-' || lastChar == '+' {
+		t := amountField.GetText()
+		if t[0] == '-' || t[0] == '+' {
+			amountField.SetText(string(lastChar) + t[1:])
+		} else {
+			amountField.SetText(string(lastChar) + t)
+		}
+	}
+	if strings.Count(textToCheck, ".") == 1 {
+		splitted := strings.Split(textToCheck, ".")
+		if len(splitted[1]) < 3 && (unicode.IsDigit(lastChar) || lastChar == '.') {
+			return true
+		}
+	} else if unicode.IsDigit(lastChar) {
+		return true
+	}
+	return false
 }
 
 // showCreateForm shows create form with initialized empty fields.
@@ -187,7 +209,7 @@ func (v *View) submitCreateForm() {
 
 // showUpdateForm shows update form with initialized with selected transaction fields.
 func (v *View) showUpdateForm() {
-	m := v.table.GetSelectedRef()
+	m := v.getSelectedRef()
 	v.updateForm.SetFields(m)
 	v.Pages.ShowPage("updateForm")
 }
@@ -204,7 +226,7 @@ func (v *View) submitUpdateForm() {
 		return
 	}
 
-	ref := v.table.GetSelectedRef()
+	ref := v.getSelectedRef()
 	m["ID"] = ref["ID"]
 
 	tr, err := v.presenter.Transaction().FromMap(m)
@@ -234,7 +256,7 @@ func (v *View) hideDeleteModal() {
 
 // submitDeleteModal delete modal submit handler.
 func (v *View) submitDeleteModal() {
-	ref := v.table.GetSelectedRef()
+	ref := v.getSelectedRef()
 	tr, err := v.presenter.Transaction().FromMap(ref)
 	if err != nil {
 		v.showError("Error parse form: \n" + err.Error())
@@ -259,4 +281,13 @@ func (v *View) showError(text string) {
 // hideError hides error modal.
 func (v *View) hideError() {
 	v.Pages.HidePage("errorModal")
+}
+
+func (v *View) getSelectedRef() map[string]string {
+	ref := v.table.GetSelectedRef()
+	ref["Amount"] = strings.Replace(ref["Amount"], "[green]", "", -1)
+	ref["Amount"] = strings.Replace(ref["Amount"], "[red]", "", -1)
+	ref["Amount"] = strings.Replace(ref["Amount"], "[white]", "", -1)
+
+	return ref
 }

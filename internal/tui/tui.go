@@ -8,8 +8,8 @@ import (
 	"github.com/kotlw/gentlemoney/internal/tui/settings"
 	"github.com/kotlw/gentlemoney/internal/tui/transactions"
 
-	"github.com/rivo/tview"
 	"github.com/gdamore/tcell/v2"
+	"github.com/rivo/tview"
 )
 
 func New(service *service.Service, presenter *presenter.Presenter) *tview.Application {
@@ -47,7 +47,7 @@ func NewRoot(app *tview.Application, service *service.Service, presenter *presen
 	root.transactions = transactions.New(service, presenter)
 	root.settings = settings.New(app, service, presenter)
 	root.AddView('1', "Transactions", root.transactions)
-	root.AddView('2', "Settings", root.settings)
+	root.AddView('0', "Settings", root.settings)
 
 	root.SwitchToView("Transactions")
 
@@ -81,7 +81,7 @@ func (r *Root) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			case '1':
 				r.SwitchToView("Transactions")
 				return
-			case '2':
+			case '0':
 				r.SwitchToView("Settings")
 				return
 			}
