@@ -8,7 +8,7 @@ func Default() *Config {
 	c := &Config{
 		App: App{
 			Name:    "gentlemoney",
-			Version: "v1.0",
+			Version: "v0.1",
 		},
 		Logger: Logger{
 			Path:     defaultPath + "/logs",

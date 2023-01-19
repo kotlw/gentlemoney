@@ -15,6 +15,7 @@ type FormDataProvider interface {
 type Form struct {
 	*tview.Form
 
+	dateFields   map[string]*DateField
 	inputFields  map[string]*tview.InputField
 	dropDowns    map[string]*tview.DropDown
 	dataProvider FormDataProvider
@@ -25,6 +26,7 @@ func NewForm(form *tview.Form, dataProvider FormDataProvider) *Form {
 	f := &Form{
 		Form: form,
 
+		dateFields:   make(map[string]*DateField),
 		inputFields:  make(map[string]*tview.InputField),
 		dropDowns:    make(map[string]*tview.DropDown),
 		dataProvider: dataProvider,
@@ -34,6 +36,10 @@ func NewForm(form *tview.Form, dataProvider FormDataProvider) *Form {
 	for i := 0; i < form.GetFormItemCount(); i++ {
 		item := form.GetFormItem(i)
 
+		dateField, ok := item.(*DateField)
+		if ok {
+			f.dateFields[item.GetLabel()] = dateField
+		}
 		inputField, ok := item.(*tview.InputField)
 		if ok {
 			f.inputFields[item.GetLabel()] = inputField
@@ -51,9 +57,15 @@ func NewForm(form *tview.Form, dataProvider FormDataProvider) *Form {
 func (f *Form) SetFields(m map[string]string) {
 	for label, value := range m {
 
-		field, ok := f.inputFields[label]
+		dateField, ok := f.dateFields[label]
 		if ok {
-			field.SetText(value)
+			dateField.SetTextDate(value)
+			continue
+		}
+
+		inputField, ok := f.inputFields[label]
+		if ok {
+			inputField.SetText(value)
 			continue
 		}
 
@@ -77,8 +89,12 @@ func (f *Form) SetFields(m map[string]string) {
 func (f *Form) GetFields() map[string]string {
 	res := make(map[string]string)
 
-	for label, field := range f.inputFields {
-		res[label] = field.GetText()
+	for label, dateField := range f.dateFields {
+		res[label] = dateField.GetTextDate()
+	}
+
+	for label, inputField := range f.inputFields {
+		res[label] = inputField.GetText()
 	}
 
 	for label, dropDown := range f.dropDowns {
