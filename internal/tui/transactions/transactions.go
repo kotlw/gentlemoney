@@ -133,7 +133,7 @@ func (v *View) amountAccept(textToCheck string, lastChar rune) bool {
 	amountField := v.createForm.GetFormItem(3).(*tview.InputField)
 	if lastChar == '-' || lastChar == '+' {
 		t := amountField.GetText()
-		if t[0] == '-' || t[0] == '+' {
+		if t != "" && (t[0] == '-' || t[0] == '+') {
 			amountField.SetText(string(lastChar) + t[1:])
 		} else {
 			amountField.SetText(string(lastChar) + t)
