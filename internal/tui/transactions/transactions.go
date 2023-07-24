@@ -113,11 +113,11 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 // newForm returns new form with corresponding transaction fields.
 func (v *View) newForm(title string, submit func(), cancel func(), dataProvider *DataProvider) *ext.Form {
 
-	form := tview.NewForm().
-		AddFormItem(ext.NewDateField().SetLabel("Date")).
+	form := tview.NewForm()
+	form = form.AddFormItem(ext.NewDateField().SetLabel("Date")).
 		AddDropDown("Category", nil, 0, nil).
 		AddDropDown("Account", nil, 0, nil).
-		AddInputField("Amount", "", 0, v.amountAccept, nil).
+		AddInputField("Amount", "", 0, v.amountAccept(form), nil).
 		AddInputField("Note", "", 0, nil, nil).
 		AddButton(strings.Split(title, " ")[0], submit).
 		AddButton("Cancel", cancel)
@@ -129,25 +129,27 @@ func (v *View) newForm(title string, submit func(), cancel func(), dataProvider 
 	return ext.NewForm(form, dataProvider)
 }
 
-func (v *View) amountAccept(textToCheck string, lastChar rune) bool {
-	amountField := v.createForm.GetFormItem(3).(*tview.InputField)
-	if lastChar == '-' || lastChar == '+' {
-		t := amountField.GetText()
-		if t != "" && (t[0] == '-' || t[0] == '+') {
-			amountField.SetText(string(lastChar) + t[1:])
-		} else {
-			amountField.SetText(string(lastChar) + t)
+func (v *View) amountAccept(form *tview.Form) func(string, rune) bool {
+	return func(textToCheck string, lastChar rune) bool {
+		amountField := form.GetFormItem(3).(*tview.InputField)
+		if lastChar == '-' || lastChar == '+' {
+			t := amountField.GetText()
+			if t != "" && (t[0] == '-' || t[0] == '+') {
+				amountField.SetText(string(lastChar) + t[1:])
+			} else {
+				amountField.SetText(string(lastChar) + t)
+			}
 		}
-	}
-	if strings.Count(textToCheck, ".") == 1 {
-		splitted := strings.Split(textToCheck, ".")
-		if len(splitted[1]) < 3 && (unicode.IsDigit(lastChar) || lastChar == '.') {
+		if strings.Count(textToCheck, ".") == 1 {
+			splitted := strings.Split(textToCheck, ".")
+			if len(splitted[1]) < 3 && (unicode.IsDigit(lastChar) || lastChar == '.') {
+				return true
+			}
+		} else if unicode.IsDigit(lastChar) {
 			return true
 		}
-	} else if unicode.IsDigit(lastChar) {
-		return true
+		return false
 	}
-	return false
 }
 
 // showCreateForm shows create form with initialized empty fields.
