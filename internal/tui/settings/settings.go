@@ -133,9 +133,17 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			case 'c':
 				v.showCategoryCreateForm()
 			case 'u':
-				v.showCategoryUpdateForm()
+        if len(v.categoryTable.GetSelectedRef()) != 0 {
+          v.showCategoryUpdateForm()
+        } else {
+          v.showError("Nothing to update")
+        }
 			case 'd':
-				v.showCategoryDeleteModal()
+        if len(v.categoryTable.GetSelectedRef()) != 0 {
+          v.showCategoryDeleteModal()
+        } else {
+          v.showError("Nothing to delete")
+        }
 			}
 
 			// navigation between settings
@@ -159,9 +167,17 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			case 'c':
 				v.showCurrencyCreateForm()
 			case 'u':
-				v.showCurrencyUpdateForm()
+        if len(v.currencyTable.GetSelectedRef()) != 0 {
+          v.showCurrencyUpdateForm()
+        } else {
+          v.showError("Nothing to update")
+        }
 			case 'd':
-				v.showCurrencyDeleteModal()
+        if len(v.currencyTable.GetSelectedRef()) != 0 {
+          v.showCurrencyDeleteModal()
+        } else {
+          v.showError("Nothing to delete")
+        }
 			}
 
 			// navigation between settings
@@ -186,9 +202,17 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			case 'c':
 				v.showAccountCreateForm()
 			case 'u':
-				v.showAccountUpdateForm()
+        if len(v.accountTable.GetSelectedRef()) != 0 {
+          v.showAccountUpdateForm()
+        } else {
+          v.showError("Nothing to update")
+        }
 			case 'd':
-				v.showAccountDeleteModal()
+        if len(v.accountTable.GetSelectedRef()) != 0 {
+          v.showAccountDeleteModal()
+        } else {
+          v.showError("Nothing to delete")
+        }
 			}
 
 			// navigation between settings

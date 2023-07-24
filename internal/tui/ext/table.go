@@ -50,7 +50,11 @@ func (t *Table) SetOrder(orderCol string, reversed bool) *Table {
 // GetSelectedRef returns a reference map[string]string of current selected row.
 func (t *Table) GetSelectedRef() map[string]string {
 	row, _ := t.GetSelection()
-	return t.GetCell(row, 0).GetReference().(map[string]string)
+  if res, ok := t.GetCell(row, 0).GetReference().(map[string]string); ok {
+    return res
+  } else {
+    return make(map[string]string)
+  }
 }
 
 // Refresh refreshes the data and redraws the table.

@@ -107,12 +107,12 @@ func (v *View) submitCurrencyUpdateForm() {
 
 // showCurrencyDeleteModal shows delete modal.
 func (v *View) showCurrencyDeleteModal() {
-	v.Pages.ShowPage("deleteCurrencyModal")
+	v.Pages.ShowPage("currencyDeleteModal")
 }
 
 // hideCurrencyDeleteModal hides delete modal.
 func (v *View) hideCurrencyDeleteModal() {
-	v.Pages.HidePage("deleteCurrencyModal")
+	v.Pages.HidePage("currencyDeleteModal")
 	v.tuiApp.SetFocus(v.currencyTable)
 }
 

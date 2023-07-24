@@ -81,11 +81,19 @@ func (v *View) InputHandler() func(event *tcell.EventKey, setFocus func(p tview.
 			}
 
 			if event.Rune() == 'u' {
-				v.showUpdateForm()
+        if len(v.table.GetSelectedRef()) != 0 {
+          v.showUpdateForm()
+        } else {
+          v.showError("Nothing to update")
+        }
 			}
 
 			if event.Rune() == 'd' {
-				v.showDeleteModal()
+        if len(v.table.GetSelectedRef()) != 0 {
+          v.showDeleteModal()
+        } else {
+          v.showError("Nothing to delete")
+        }
 			}
 
 			// if none of keys has pressed use standard table input handler.
